@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DiscordProjectSettings">
+    <option name="show" value="ASK" />
+    <option name="description" value="" />
+    <option name="applicationTheme" value="default" />
+    <option name="iconsTheme" value="default" />
+    <option name="button1Title" value="" />
+    <option name="button1Url" value="" />
+    <option name="button2Title" value="" />
+    <option name="button2Url" value="" />
+    <option name="customApplicationId" value="" />
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/services/config-server/pom.xml" />
+        <option value="$PROJECT_DIR$/services/discovery/pom.xml" />
+        <option value="$PROJECT_DIR$/services/user/pom.xml" />
+        <option value="$PROJECT_DIR$/services/customer/pom.xml" />
+        <option value="$PROJECT_DIR$/services/vendor/pom.xml" />
+        <option value="$PROJECT_DIR$/services/product/pom.xml" />
+        <option value="$PROJECT_DIR$/services/order/pom.xml" />
+        <option value="$PROJECT_DIR$/services/payment/pom.xml" />
+        <option value="$PROJECT_DIR$/services/transactionHistory/pom.xml" />
+        <option value="$PROJECT_DIR$/services/notification/pom.xml" />
+        <option value="$PROJECT_DIR$/services/shipping/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_22" default="true" project-jdk-name="openjdk-22" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

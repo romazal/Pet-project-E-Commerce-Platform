@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3316/customer
+    username: romazal
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 4020
+
+#application:
+#  config:
+#    payment-service-url: http://localhost:4050/api/v1/payments ...?
