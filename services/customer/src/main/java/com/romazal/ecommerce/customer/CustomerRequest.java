@@ -20,13 +20,13 @@ public record CustomerRequest(
         @NotEmpty(message = "First name cannot be empty")
         @Pattern(regexp = "^[a-zA-Z\\s'-]+$",
                 message = "First name can only contain letters, spaces, hyphens, and apostrophes")
-        String firstName,
+        String firstname,
 
         @NotNull(message = "Last name is required")
         @NotEmpty(message = "Last name cannot be empty")
         @Pattern(regexp = "^[a-zA-Z\\s'-]+$",
                 message = "Last name can only contain letters, spaces, hyphens, and apostrophes")
-        String lastName,
+        String lastname,
 
         @NotNull(message = "Phone number is required")
         @NotEmpty(message = "Phone number cannot be empty")

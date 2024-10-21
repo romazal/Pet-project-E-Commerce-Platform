@@ -7,6 +7,7 @@ import static com.romazal.ecommerce.vendor.Status.*;
 @Service
 public class VendorMapper {
     public Vendor toVendor(VendorRequest vendorRequest) {
+        if(vendorRequest == null) return null;
 
         return new Vendor().builder()
                 .id(vendorRequest.id())
@@ -20,5 +21,20 @@ public class VendorMapper {
                 .description(vendorRequest.description())
                 .status(ACTIVE)
                 .build();
+    }
+
+    public VendorResponse toVendorResponse(Vendor vendor) {
+        if(vendor == null) return null;
+
+        return new VendorResponse(
+                vendor.getUsername(),
+                vendor.getStoreName(),
+                vendor.getStoreAddress(),
+                vendor.getStorePhone(),
+                vendor.getStoreEmail(),
+                vendor.getDescription(),
+                vendor.getStatus()
+        );
+
     }
 }
