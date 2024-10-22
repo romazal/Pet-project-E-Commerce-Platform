@@ -1,6 +1,6 @@
 services:
 
-  # MySQL for User, Vendor, and Product Databases
+  # MySQL for Vendor and Customer Databases
   mysql:
     image: mysql
     container_name: mysql-db
@@ -27,7 +27,7 @@ services:
     depends_on:
       - mysql
 
-  # PostgreSQL for Orders and Supply Chain/Delivery Databases
+  # PostgreSQL for Orders, Products and Supply Chain/Delivery Databases
   postgres:
     image: postgres
     container_name: postgres-db

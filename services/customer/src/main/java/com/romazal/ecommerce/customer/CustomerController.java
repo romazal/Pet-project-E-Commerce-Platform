@@ -34,7 +34,7 @@ public class CustomerController {
             @RequestBody @Valid CustomerRequest customerRequest
     ) {
         service.updateCustomerById(customerRequest);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/profiles/{customer-id}")
