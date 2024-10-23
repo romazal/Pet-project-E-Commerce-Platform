@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 @Service
@@ -27,7 +28,7 @@ public class ProductsService {
     public ProductResponse getProductById(UUID productId) {
         return repository.findById(productId).map(mapper::toProductResponse)
                 .orElseThrow(() -> new ProductNotFoundException(
-                        String.format("No product found with the provided ID:: %s", productId)
+                        format("No product found with the provided ID:: %s", productId)
                 ));
     }
 
@@ -41,7 +42,7 @@ public class ProductsService {
     public void updateProduct(ProductRequest productRequest) {
         var product = repository.findById(productRequest.productId())
                 .orElseThrow(() -> new ProductNotFoundException(
-                        String.format("No product found with the provided ID:: %s", productRequest.productId())
+                        format("No product found with the provided ID:: %s", productRequest.productId())
                 ));
 
         mergeProduct(product, productRequest);

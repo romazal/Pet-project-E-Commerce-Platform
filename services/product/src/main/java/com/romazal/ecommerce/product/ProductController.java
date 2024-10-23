@@ -10,7 +10,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
-public class ProductControler {
+public class ProductController {
 
     private final ProductsService service;
 

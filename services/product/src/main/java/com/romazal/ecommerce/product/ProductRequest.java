@@ -26,19 +26,23 @@ public record ProductRequest(
 
 
         @NotNull(message = "Price is required.")
-        @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
+        @DecimalMin(value = "0.0", inclusive = false,
+                message = "Price must be greater than 0")
         BigDecimal price,
 
         @NotNull(message = "Category is required")
         Category categoryId,
 
-        @Min(value = 0, message = "Stock quantity must be at least 0")
+        @Min(value = 0,
+                message = "Stock quantity must be at least 0")
         Double stockQuantity,
 
-        @Min(value = 0, message = "Threshold quantity must be at least 0")
+        @Min(value = 0,
+                message = "Threshold quantity must be at least 0")
         Double thresholdQuantity,
 
-        @Size(max = 50, message = "SKU cannot exceed 50 characters")
+        @Size(max = 50,
+                message = "SKU cannot exceed 50 characters")
         String sku
 
 ) {
