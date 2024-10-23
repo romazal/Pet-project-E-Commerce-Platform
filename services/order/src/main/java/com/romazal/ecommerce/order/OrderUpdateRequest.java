@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.order;
 
 import com.romazal.ecommerce.orderItem.OrderItem;
+import com.romazal.ecommerce.product.PurchaseRequest;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -31,6 +32,6 @@ public record OrderUpdateRequest(
 
         @Size(min = 1,
                 message = "There must be at least one order item")
-        List<OrderItem> orderItems
+        List<PurchaseRequest> orderItems
 ) {
 }

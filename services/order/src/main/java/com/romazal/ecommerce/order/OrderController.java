@@ -47,5 +47,10 @@ public class OrderController {
         return ResponseEntity.accepted().build();
     }
 
+    @PutMapping("/queue-up/{order-id}")
+    public ResponseEntity<UUID> queueUpOrder(@PathVariable("order-id") UUID orderId) {
+        return ResponseEntity.ok(service.queueUpOrder(orderId));
+    }
+
 
 }

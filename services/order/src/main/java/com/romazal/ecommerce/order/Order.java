@@ -21,7 +21,7 @@ import static jakarta.persistence.EnumType.*;
 @Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "customer_profiles")
+@Table(name = "orders")
 public class Order {
 
     @Id

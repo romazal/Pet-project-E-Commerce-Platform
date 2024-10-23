@@ -5,6 +5,6 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class OrderNotFoundException extends RuntimeException {
+public class MicroserviceBusinessException extends RuntimeException {
     private final String message;
 }

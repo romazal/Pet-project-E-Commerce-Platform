@@ -1,5 +1,6 @@
 package com.romazal.ecommerce.order;
 
+import com.romazal.ecommerce.payment.PaymentRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,6 @@ public class OrderMapper {
                 .orderStatus(orderRequest.orderStatus())
                 .paymentMethod(orderRequest.paymentMethod())
                 .shippingAddress(orderRequest.shippingAddress())
-                .orderItems(orderRequest.orderItems())
                 .build();
 
     }
@@ -31,9 +31,16 @@ public class OrderMapper {
                 order.getOrderStatus(),
                 order.getPaymentMethod(),
                 order.getShippingAddress(),
-                order.getOrderItems(),
                 order.getCreatedDate(),
                 order.getLastModifiedDate()
+        );
+    }
+
+    public PaymentRequest toPaymentResponse(Order order) {
+        if (order == null) return null;
+
+        return new PaymentRequest(
+
         );
     }
 }
