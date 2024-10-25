@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.order;
 
-import com.romazal.ecommerce.orderItem.OrderItem;
+import com.romazal.ecommerce.payment.PaymentMethod;
+import com.romazal.ecommerce.payment.PaymentStatus;
 import com.romazal.ecommerce.product.PurchaseRequest;
 import jakarta.validation.constraints.*;
 

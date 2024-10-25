@@ -32,7 +32,10 @@ public class CustomerService {
     }
 
     public List<CustomerResponse> getAllCustomers() {
-        return repository.findAll().stream().map(mapper::toCustomerResponse).collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .map(mapper::toCustomerResponse)
+                .collect(Collectors.toList());
     }
 
     public void updateCustomerById(CustomerRequest customerRequest) {

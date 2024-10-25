@@ -1,6 +1,8 @@
 package com.romazal.ecommerce.order;
 
 import com.romazal.ecommerce.orderItem.OrderItem;
+import com.romazal.ecommerce.payment.PaymentMethod;
+import com.romazal.ecommerce.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.romazal.ecommerce.order.OrderStatus.*;
 import static jakarta.persistence.EnumType.*;
 
 @NoArgsConstructor
@@ -35,12 +38,11 @@ public class Order {
     private BigDecimal totalAmount;
 
     @Enumerated(STRING)
-    @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private OrderStatus orderStatus;
+    private OrderStatus orderStatus = UNFINISHED;
 
     @Enumerated(STRING)
     @Column(nullable = false)

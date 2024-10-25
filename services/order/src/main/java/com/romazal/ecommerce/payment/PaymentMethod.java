@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.order;
+package com.romazal.ecommerce.payment;
 
 public enum PaymentMethod {
     PAYPAL,

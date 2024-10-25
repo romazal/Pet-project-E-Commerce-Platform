@@ -68,7 +68,7 @@ public class OrderService {
         }
 
         if (order.getOrderStatus() == OrderStatus.CONFIRMED) {
-            order.setOrderStatus(UNFINISHED);
+            order.setOrderStatus(PENDING);
             repository.save(order);
             queueUpOrder(order.getOrderId());
         }
@@ -113,7 +113,7 @@ public class OrderService {
         mergeOrder(order, orderUpdateRequest);
 
         if (order.getOrderStatus() == OrderStatus.CONFIRMED) {
-            order.setOrderStatus(UNFINISHED);
+            order.setOrderStatus(PENDING);
             repository.save(order);
             queueUpOrder(order.getOrderId());
         }
@@ -207,9 +207,13 @@ public class OrderService {
                 format("No order found with the provided ID:: %s", orderId)
         ));
 
-        if (order.getOrderStatus() != UNFINISHED) {
+        if (
+            order.getOrderStatus() == CONFIRMED
+            || order.getOrderStatus() == SHIPPED
+            || order.getOrderStatus() == DELIVERED
+        ) {
             throw new BusinessException(
-                    format("Order is already queued up, current status:: %s,", order.getOrderStatus())
+                    format("Order is already confirmed, current status:: %s,", order.getOrderStatus())
             );
         }
 

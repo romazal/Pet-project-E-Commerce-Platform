@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.order;
 
-import com.romazal.ecommerce.orderItem.OrderItem;
+import com.romazal.ecommerce.payment.PaymentMethod;
+import com.romazal.ecommerce.payment.PaymentStatus;
 import com.romazal.ecommerce.product.PurchaseRequest;
 import jakarta.validation.constraints.*;
 
@@ -23,7 +24,6 @@ public record OrderRequest(
         @NotNull(message = "Payment status is required")
         PaymentStatus paymentStatus,
 
-        @NotNull(message = "Order status is required")
         OrderStatus orderStatus,
 
         @NotNull(message = "Payment method is required")
