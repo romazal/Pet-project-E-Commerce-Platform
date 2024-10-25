@@ -118,7 +118,7 @@ public class PaymentService {
     }
 
     public List<PaymentResponse> getPaymentHistoryByOrderId(UUID orderId) {
-        return repository.findByOrderIdOrderByCreatedDateDesc(orderId)
+        return repository.findAllByOrderIdOrderByCreatedDateDesc(orderId)
                 .stream()
                 .map(mapper::toPaymentResponse)
                 .toList();

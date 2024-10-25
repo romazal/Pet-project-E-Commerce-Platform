@@ -35,10 +35,14 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{order-id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable("order-id") UUID orderId) {
-        service.deleteOrder(orderId);
-        return ResponseEntity.accepted().build();
+    @PutMapping("/queue-up/{order-id}")
+    public ResponseEntity<UUID> queueUpOrder(@PathVariable("order-id") UUID orderId) {
+        return ResponseEntity.ok(service.queueUpOrder(orderId));
+    }
+
+    @PutMapping("/confirm/{order-id}")
+    public ResponseEntity<UUID> confirmOrder(@PathVariable("order-id") UUID orderId) {
+        return ResponseEntity.ok(service.confirmOrder(orderId));
     }
 
     @PutMapping("/cancel/{order-id}")
@@ -47,10 +51,9 @@ public class OrderController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/queue-up/{order-id}")
-    public ResponseEntity<UUID> queueUpOrder(@PathVariable("order-id") UUID orderId) {
-        return ResponseEntity.ok(service.queueUpOrder(orderId));
+    @DeleteMapping("/{order-id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable("order-id") UUID orderId) {
+        service.deleteOrder(orderId);
+        return ResponseEntity.accepted().build();
     }
-
-
 }

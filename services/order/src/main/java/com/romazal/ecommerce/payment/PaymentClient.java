@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface PaymentClient {
 
     @PostMapping
-    UUID requestOrderPayment(@RequestBody PaymentRequest request);
+    UUID createPayment(@RequestBody PaymentRequest request);
 }

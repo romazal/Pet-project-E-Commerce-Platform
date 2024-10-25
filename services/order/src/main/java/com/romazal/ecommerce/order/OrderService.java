@@ -6,8 +6,11 @@ import com.romazal.ecommerce.exception.MicroserviceBusinessException;
 import com.romazal.ecommerce.orderItem.OrderItemMapper;
 import com.romazal.ecommerce.orderItem.OrderItemRequest;
 import com.romazal.ecommerce.orderItem.OrderItemService;
+import com.romazal.ecommerce.payment.PaymentClient;
+import com.romazal.ecommerce.payment.PaymentRequest;
 import com.romazal.ecommerce.product.ProductClient;
 import com.romazal.ecommerce.product.PurchaseRequest;
+import com.romazal.ecommerce.shipping.ShippingClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.romazal.ecommerce.order.OrderStatus.*;
+import static com.romazal.ecommerce.orderItem.OrderItemsStatus.RESERVED;
+import static com.romazal.ecommerce.orderItem.OrderItemsStatus.UNRESERVED;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -29,7 +34,8 @@ public class OrderService {
     private final OrderItemService orderItemService;
     private final ProductClient productClient;
     private final CustomerClient customerClient;
-    //private final PaymentClient paymentClient;
+    private final PaymentClient paymentClient;
+    private final ShippingClient shippingClient;
     //private final OrderKafkaProducer orderKafkaProducer;
 
 
@@ -43,7 +49,7 @@ public class OrderService {
 
         if (orderRequest.orderStatus() != OrderStatus.UNFINISHED && orderRequest.orderStatus() != OrderStatus.CONFIRMED) {
             throw new IllegalArgumentException(
-                    format("Invalid order status: %s. Must be either UNFINISHED or CONFIRMED.", orderRequest.orderStatus())
+                    format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderRequest.orderStatus())
             );
         }
 
@@ -67,9 +73,7 @@ public class OrderService {
             );
         }
 
-        if (order.getOrderStatus() == OrderStatus.CONFIRMED) {
-            order.setOrderStatus(PENDING);
-            repository.save(order);
+        if (order.getOrderStatus() == PENDING) {
             queueUpOrder(order.getOrderId());
         }
 
@@ -106,15 +110,13 @@ public class OrderService {
 
         if (orderUpdateRequest.orderStatus() != OrderStatus.UNFINISHED && orderUpdateRequest.orderStatus() != OrderStatus.CONFIRMED) {
             throw new java.lang.IllegalArgumentException(
-                    format("Invalid order status: %s. Must be either UNFINISHED or CONFIRMED.", orderUpdateRequest.orderStatus())
+                    format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderUpdateRequest.orderStatus())
             );
         }
 
         mergeOrder(order, orderUpdateRequest);
 
-        if (order.getOrderStatus() == OrderStatus.CONFIRMED) {
-            order.setOrderStatus(PENDING);
-            repository.save(order);
+        if (order.getOrderStatus() == PENDING) {
             queueUpOrder(order.getOrderId());
         }
 
@@ -208,27 +210,69 @@ public class OrderService {
         ));
 
         if (
-            order.getOrderStatus() == CONFIRMED
-            || order.getOrderStatus() == SHIPPED
-            || order.getOrderStatus() == DELIVERED
+                order.getOrderStatus() == CONFIRMED
+                || order.getOrderStatus() == SHIPPED
+                || order.getOrderStatus() == DELIVERED
+                || order.getOrderStatus() == CANCELED
         ) {
             throw new BusinessException(
                     format("Order is already confirmed, current status:: %s,", order.getOrderStatus())
             );
         }
 
-        var purchasedProducts = productClient.purchaseProducts(
-                orderItemService.getAllOrderItemsByOrderId(orderId)
-                        .stream()
-                        .map(orderItemMapper::toPurchaseRequest)
-                        .toList()
-        );
+        if (order.getOrderItemsStatus() == UNRESERVED) {
+            var purchasedProducts = productClient.purchaseProducts(
+                    orderItemService.getAllOrderItemsByOrderId(orderId)
+                            .stream()
+                            .map(orderItemMapper::toPurchaseRequest)
+                            .toList()
+            );
+
+            order.setOrderItemsStatus(RESERVED);
+        }
 
         order.setOrderStatus(PENDING);
 
         var paymentResponse = mapper.toPaymentResponse(order);
 
-        //todo
-        return null;
+        paymentClient.createPayment(paymentResponse);
+
+        return repository.save(order).getOrderId();
+    }
+
+    public UUID confirmOrder(UUID orderId) {
+        var order = repository.findById(orderId).orElseThrow(() -> new IllegalArgumentException(
+                format("No order found with the provided ID:: %s", orderId)
+        ));
+
+        if (
+                order.getOrderStatus() == CONFIRMED
+                        || order.getOrderStatus() == SHIPPED
+                        || order.getOrderStatus() == DELIVERED
+                        || order.getOrderStatus() == CANCELED
+        ) {
+            throw new BusinessException(
+                    format("Order is already confirmed, current status:: %s,", order.getOrderStatus())
+            );
+        }
+
+        if (order.getOrderItemsStatus() == UNRESERVED) {
+            var purchasedProducts = productClient.purchaseProducts(
+                    orderItemService.getAllOrderItemsByOrderId(orderId)
+                            .stream()
+                            .map(orderItemMapper::toPurchaseRequest)
+                            .toList()
+            );
+
+            order.setOrderItemsStatus(RESERVED);
+        }
+
+        order.setOrderStatus(CONFIRMED);
+
+        var shippingResponse = mapper.toShippingResponse(order);
+
+        shippingClient.createShipping(shippingResponse);
+
+        return repository.save(order).getOrderId();
     }
 }

@@ -1,6 +1,6 @@
 package com.romazal.ecommerce.handler;
 
-import com.romazal.ecommerce.exception.VendorNotFoundException;
+import com.romazal.ecommerce.exception.ShippingNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,9 +13,21 @@ import java.util.HashMap;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(VendorNotFoundException.class)
-    public ResponseEntity<String> handle(VendorNotFoundException e) {
+    /*@ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handle(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }*/
+
+    @ExceptionHandler(ShippingNotFoundException.class)
+    public ResponseEntity<String> handle(ShippingNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handle(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 
@@ -32,4 +44,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(errors));
     }
+
 }

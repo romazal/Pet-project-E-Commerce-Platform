@@ -12,3 +12,7 @@ spring:
 
 server:
   port: 4080
+
+application:
+  config:
+    order-url: http://localhost:4050/api/v1/orders

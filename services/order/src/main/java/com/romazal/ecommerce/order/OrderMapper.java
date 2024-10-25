@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.order;
 
 import com.romazal.ecommerce.payment.PaymentRequest;
+import com.romazal.ecommerce.shipping.ShippingCreationRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,7 +41,17 @@ public class OrderMapper {
         if (order == null) return null;
 
         return new PaymentRequest(
+                order.getOrderId(),
+                order.getTotalAmount(),
+                order.getPaymentMethod()
+        );
+    }
 
+    public ShippingCreationRequest toShippingResponse(Order order) {
+        if (order == null) return null;
+
+        return new ShippingCreationRequest(
+                order.getOrderId()
         );
     }
 }

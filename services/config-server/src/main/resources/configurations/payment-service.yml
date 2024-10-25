@@ -19,5 +19,11 @@ spring:
 #application:
 #  config:
 #    product-url: http://localhost:4500/api/v1/products
+
+application:
+  config:
+    order-url: http://localhost:4050/api/v1/orders
+
+
 server:
   port: 4060
