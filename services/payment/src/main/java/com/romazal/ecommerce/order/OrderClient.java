@@ -2,7 +2,7 @@ package com.romazal.ecommerce.order;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.UUID;
 
@@ -11,6 +11,6 @@ import java.util.UUID;
         url = "${application.config.order-url}"
 )
 public interface OrderClient {
-    @PostMapping
+    @PutMapping
     UUID confirmOrder(@PathVariable("order-id") UUID orderId);
 }

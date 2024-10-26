@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.vendor;
 
 import com.romazal.ecommerce.exception.VendorNotFoundException;
+import com.romazal.ecommerce.product.ProductClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class VendorService {
 
     private final VendorRepository repository;
     private final VendorMapper mapper;
+    private final ProductClient productClient;
 
 
     public Long registerVendor(VendorRequest vendorRequest) {
@@ -82,11 +84,16 @@ public class VendorService {
     }
 
     public void deleteVendorById(Long vendorId) {
+        if(!repository.existsById(vendorId)){
+            throw new VendorNotFoundException(
+                    format("No vendor found with the provided ID:: %s", vendorId)
+            );
+        }
+
         repository.deleteById(vendorId);
     }
 
     public List getAllProductsByVendorId(Long vendorId) {
-        //todo
-        return null;
+        return productClient.getAllProductsByVendorId(vendorId);
     }
 }

@@ -275,4 +275,11 @@ public class OrderService {
 
         return repository.save(order).getOrderId();
     }
+
+    public List<OrderResponse> getAllOrdersByCustomerId(Long customerId) {
+        return repository.findAllByCustomerId(customerId)
+                .stream()
+                .map(mapper::toOrderResponse)
+                .toList();
+    }
 }

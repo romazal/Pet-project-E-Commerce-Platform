@@ -13,12 +13,13 @@
         <module name="discovery" />
         <module name="vendor" />
         <module name="payment" />
-        <module name="transactionHistory" />
+        <module name="productMovements" />
         <module name="customer" />
         <module name="order" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="transactionHistory" target="22" />
       <module name="user" target="22" />
     </bytecodeTargetLevel>
   </component>
@@ -31,6 +32,7 @@
       <module name="order" options="-parameters" />
       <module name="payment" options="-parameters" />
       <module name="product" options="-parameters" />
+      <module name="productMovements" options="-parameters" />
       <module name="shipping" options="-parameters" />
       <module name="transactionHistory" options="-parameters" />
       <module name="user" options="-parameters" />

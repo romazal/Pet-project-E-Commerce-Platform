@@ -56,4 +56,9 @@ public class OrderController {
         service.deleteOrder(orderId);
         return ResponseEntity.accepted().build();
     }
+
+    @GetMapping("/customer/{customer-id}")
+    public ResponseEntity<List<OrderResponse>> getAllOrdersByCustomerId(@PathVariable("customer-id") Long customerId){
+        return ResponseEntity.ok(service.getAllOrdersByCustomerId(customerId));
+    }
 }

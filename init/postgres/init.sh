@@ -12,8 +12,8 @@ if ! psql -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw payment; then
     createdb -U $POSTGRES_USER payment
 fi
 
-if ! psql -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw transaction_history; then
-    createdb -U $POSTGRES_USER transaction_history
+if ! psql -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw product_movement; then
+    createdb -U $POSTGRES_USER product_movement
 fi
 
 if ! psql -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw shipping; then

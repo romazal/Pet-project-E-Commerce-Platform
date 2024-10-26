@@ -1,8 +1,11 @@
 package com.romazal.ecommerce.customer;
 
 import com.romazal.ecommerce.exception.CustomerNotFoundException;
+import com.romazal.ecommerce.order.OrderClient;
+import com.romazal.ecommerce.order.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,7 @@ public class CustomerService {
 
     private final CustomerRepository repository;
     private final CustomerMapper mapper;
+    private final OrderClient orderClient;
 
 
     public Long registerCustomer(CustomerRequest customerRequest) {
@@ -89,8 +93,13 @@ public class CustomerService {
         repository.deleteById(customerId);
     }
 
-    public List getAllOrdersByCustomerId(Long customerId) {
-        //todo
-        return null;
+    public List<OrderResponse> getAllOrdersByCustomerId(Long customerId) {
+        if(!repository.existsById(customerId)){
+            throw new CustomerNotFoundException(
+                    format("No customer found with the provided ID:: %s", customerId)
+            );
+        }
+
+        return orderClient.getAllOrdersByCustomerId(customerId);
     }
 }

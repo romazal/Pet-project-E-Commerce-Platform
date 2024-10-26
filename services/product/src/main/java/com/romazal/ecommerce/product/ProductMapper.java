@@ -3,10 +3,6 @@ package com.romazal.ecommerce.product;
 import com.romazal.ecommerce.category.Category;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Service
 public class ProductMapper {
     public Product toProduct(ProductRequest productRequest) {
@@ -18,7 +14,11 @@ public class ProductMapper {
                 .name(productRequest.name())
                 .description(productRequest.description())
                 .price(productRequest.price())
-                .category(productRequest.categoryId())
+                .category(
+                        new Category().builder()
+                                .categoryId(productRequest.categoryId())
+                                .build()
+                )
                 .stockQuantity(productRequest.stockQuantity())
                 .thresholdQuantity(productRequest.thresholdQuantity())
                 .sku(productRequest.sku())
@@ -38,9 +38,19 @@ public class ProductMapper {
                 product.getThresholdQuantity(),
                 product.getSku(),
                 product.getCreatedDate(),
-                product.getCategory(),
+                product.getCategory().getCategoryId(),
                 product.getCategory().getName(),
                 product.getCategory().getDescription()
+        );
+    }
+
+    public ProductPurchaseResponse toProductPurchaseResponse(Product product, double quantity) {
+        return new ProductPurchaseResponse(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                quantity
         );
     }
 }

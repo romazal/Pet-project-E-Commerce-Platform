@@ -1,5 +1,6 @@
 package com.romazal.ecommerce.customer;
 
+import com.romazal.ecommerce.order.OrderResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class CustomerController {
     }
 
     @GetMapping("/orders/{customer-id}")
-    public ResponseEntity<List> getAllOrdersByCustomerId(@PathVariable Long customerId) {
+    public ResponseEntity<List<OrderResponse>> getAllOrdersByCustomerId(@PathVariable Long customerId) {
         return ResponseEntity.ok(service.getAllOrdersByCustomerId(customerId));
     }
 

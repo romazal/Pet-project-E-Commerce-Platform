@@ -31,7 +31,7 @@ public record ProductRequest(
         BigDecimal price,
 
         @NotNull(message = "Category is required")
-        Category categoryId,
+        UUID categoryId,
 
         @Min(value = 0,
                 message = "Stock quantity must be at least 0")
