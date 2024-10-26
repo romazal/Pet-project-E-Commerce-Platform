@@ -20,13 +20,13 @@ public class OrderItemService {
     }
 
     public List<OrderItemResponse> getAllOrderItemsByOrderId(UUID orderId) {
-        return repository.findAllByOrderId(orderId)
+        return repository.findAllByOrder_OrderId(orderId)
                 .stream()
                 .map(mapper::toOrderItemResponse)
                 .collect(Collectors.toList());
     }
 
     public void deleteAllOrderItemsByOrderId(UUID orderId) {
-        repository.deleteAllByOrderId(orderId);
+        repository.deleteAllByOrder_OrderId(orderId);
     }
 }

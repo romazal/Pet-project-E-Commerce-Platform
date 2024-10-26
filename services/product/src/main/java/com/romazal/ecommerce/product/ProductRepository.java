@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllProductsByVendorId(Long vendorId);
 
-    List<Product> findAllByProductIdInOrderById(List<UUID> productIds);
+    List<Product> findAllByProductIdInOrderByProductId(List<UUID> productIds);
 }

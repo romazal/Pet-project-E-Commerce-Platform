@@ -111,7 +111,7 @@ public class ProductService {
                 .map(ProductPurchaseRequest::productId)
                 .toList();
 
-        var storedProducts = repository.findAllByProductIdInOrderById(productIds);
+        var storedProducts = repository.findAllByProductIdInOrderByProductId(productIds);
 
         if (productIds.size() != storedProducts.size()) {
             throw new ProductPurchaseException("One or more products do not exist");

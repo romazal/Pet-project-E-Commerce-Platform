@@ -33,7 +33,7 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY)
     private Category parentCategoryId;
 
-    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Product> products;
 
     @CreatedDate
