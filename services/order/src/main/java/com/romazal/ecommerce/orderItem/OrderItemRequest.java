@@ -1,6 +1,5 @@
 package com.romazal.ecommerce.orderItem;
 
-import com.romazal.ecommerce.order.Order;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

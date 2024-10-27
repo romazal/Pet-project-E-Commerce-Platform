@@ -2,6 +2,8 @@ package com.romazal.ecommerce.payment;
 
 import org.springframework.stereotype.Service;
 
+import static com.romazal.ecommerce.payment.PaymentStatus.*;
+
 @Service
 public class PaymentMapper {
 
@@ -12,6 +14,7 @@ public class PaymentMapper {
                 .orderId(paymentRequest.orderId())
                 .totalAmount(paymentRequest.totalAmount())
                 .paymentMethod(paymentRequest.paymentMethod())
+                .paymentStatus(PENDING)
                 .build();
     }
 

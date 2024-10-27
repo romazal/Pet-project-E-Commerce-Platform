@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,18 +52,18 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Product Threshold Notification</h1>
-        <p>Dear <span class="highlight">{{storeName}}</span>,</p>
-        <p>We would like to inform you that the current stock quantity for the product <span class="highlight">{{productName}}</span> (ID: <span class="highlight">{{productId}}</span>, SKU: <span class="highlight">{{sku}}</span>) has fallen below the specified threshold value.</p>
-        <p>Current Stock Quantity: <span class="highlight">{{stockQuantity}}</span><br>
-            Threshold Quantity: <span class="highlight">{{thresholdQuantity}}</span></p>
-        <p>Please take the necessary actions to restock the product.</p>
-        <a href="https://localhost:4040/api/v1/products/{{productId}}" class="button">View Product</a>
-        <div class="footer">
-            <p>Thank you for your attention!</p>
-            <p>Best regards,<br>Your E-commerce Team</p>
-        </div>
+<div class="container">
+    <h1>Product Threshold Notification</h1>
+    <p>Dear <span class="highlight" th:text="${storeName}"></span>,</p>
+    <p>We would like to inform you that the current stock quantity for the product <span class="highlight" th:text="${productName}"></span> (ID: <span class="highlight" th:text="${productId}"></span>, SKU: <span class="highlight" th:text="${sku}"></span>) has fallen below the specified threshold value.</p>
+    <p>Current Stock Quantity: <span class="highlight" th:text="${stockQuantity}"></span><br>
+        Threshold Quantity: <span class="highlight" th:text="${thresholdQuantity}"></span></p>
+    <p>Please take the necessary actions to restock the product.</p>
+    <a th:href="@{https://localhost:4040/api/v1/products/${productId}}" class="button">View Product</a>
+    <div class="footer">
+        <p>Thank you for your attention!</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
     </div>
+</div>
 </body>
 </html>

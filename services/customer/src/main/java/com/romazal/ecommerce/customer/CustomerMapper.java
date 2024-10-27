@@ -24,6 +24,7 @@ public class CustomerMapper {
         if (customer == null) return null;
 
         return new CustomerResponse(
+            customer.getId(),
             customer.getUsername(),
             customer.getFirstname(),
             customer.getLastname(),

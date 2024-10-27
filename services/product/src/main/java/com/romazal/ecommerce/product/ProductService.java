@@ -8,6 +8,7 @@ import com.romazal.ecommerce.kafka.ProductThresholdNotification;
 import com.romazal.ecommerce.vendor.VendorClient;
 import com.romazal.ecommerce.vendor.VendorContactResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository repository;
@@ -113,55 +115,73 @@ public class ProductService {
     }
 
     public List<ProductPurchaseResponse> purchaseProducts(List<ProductPurchaseRequest> request) {
+        log.info("Starting product purchase process for {} items", request.size());
+
         var productIds = request.stream()
                 .map(ProductPurchaseRequest::productId)
                 .toList();
+        log.debug("Collected product IDs from purchase requests: {}", productIds);
 
         var storedProducts = repository.findAllByProductIdInOrderByProductId(productIds);
+        log.debug("Fetched {} products from repository matching IDs", storedProducts.size());
 
         if (productIds.size() != storedProducts.size()) {
+            log.error("Mismatch in requested product count and stored products; some products do not exist.");
             throw new ProductPurchaseException("One or more products do not exist");
         }
 
         var storedRequest = request.stream()
                 .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
                 .toList();
+        log.debug("Sorted purchase requests by product ID");
 
         var purchasedProducts = new ArrayList<ProductPurchaseResponse>();
 
         for (int i = 0; i < storedProducts.size(); i++) {
             var product = storedProducts.get(i);
             var productRequest = storedRequest.get(i);
-            if(product.getStockQuantity() < productRequest.quantity()){
+            log.info("Processing purchase for Product ID: {}, Requested Quantity: {}", product.getProductId(), productRequest.quantity());
+
+            if (product.getStockQuantity() < productRequest.quantity()) {
+                log.error("Insufficient stock for Product ID: {}; Available: {}, Requested: {}",
+                        product.getProductId(), product.getStockQuantity(), productRequest.quantity());
                 throw new ProductPurchaseException(
-                        "Insufficient stock remaining quantity of product with ID:: " + productRequest.productId()
+                        "Insufficient stock for product with ID:: " + productRequest.productId()
                 );
             }
 
             var newAvailableQuantity = product.getStockQuantity() - productRequest.quantity();
             product.setStockQuantity(newAvailableQuantity);
             repository.save(product);
-            purchasedProducts.add(mapper.toProductPurchaseResponse(product, productRequest.quantity()));
+            log.info("Updated stock for Product ID: {}. New quantity: {}", product.getProductId(), newAvailableQuantity);
 
-            if(product.getStockQuantity() <= product.getThresholdQuantity()) {
+            var response = mapper.toProductPurchaseResponse(product, productRequest.quantity());
+            purchasedProducts.add(response);
+            log.debug("Added ProductPurchaseResponse for Product ID: {} with quantity: {}", product.getProductId(), productRequest.quantity());
+
+            if (product.getStockQuantity() <= product.getThresholdQuantity()) {
+                log.warn("Stock for Product ID: {} has reached threshold. Initiating vendor notification.", product.getProductId());
+
                 VendorContactResponse vendorContacts = vendorClient.getVendorContactsByVendorId(product.getVendorId());
+                log.info("Fetched vendor contact for Vendor ID: {}", product.getVendorId());
 
                 notificationKafkaTemplate.sendProductThresholdNotification(
                         new ProductThresholdNotification(
-                            product.getProductId(),
-                            product.getName(),
-                            product.getSku(),
-                            product.getStockQuantity(),
-                            product.getThresholdQuantity(),
-                            vendorContacts.storeName(),
-                            vendorContacts.storeEmail()
+                                product.getProductId(),
+                                product.getName(),
+                                product.getSku(),
+                                product.getStockQuantity(),
+                                product.getThresholdQuantity(),
+                                vendorContacts.storeName(),
+                                vendorContacts.storeEmail()
                         )
                 );
+                log.info("Sent threshold notification for Product ID: {} to vendor store: {}", product.getProductId(), vendorContacts.storeName());
             }
         }
 
-
-
+        log.info("Completed product purchase process with {} purchased products", purchasedProducts.size());
         return purchasedProducts;
     }
+
 }

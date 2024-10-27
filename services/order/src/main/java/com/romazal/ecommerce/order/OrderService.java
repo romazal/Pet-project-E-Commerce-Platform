@@ -12,6 +12,7 @@ import com.romazal.ecommerce.product.ProductClient;
 import com.romazal.ecommerce.product.PurchaseRequest;
 import com.romazal.ecommerce.shipping.ShippingClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository repository;
@@ -40,45 +42,68 @@ public class OrderService {
 
 
     public UUID createOrder(OrderRequest orderRequest) {
+        log.info("Starting to create order for customer ID: {}", orderRequest.customerId());
+
+        // Map the order request to the Order entity
         Order order = mapper.toOrder(orderRequest);
+        log.info("Mapped OrderRequest to Order entity: {}", order);
 
+        // Fetch customer details
         var customer = customerClient.findCustomerById(orderRequest.customerId())
-                .orElseThrow(() -> new MicroserviceBusinessException(
-                        format("No customer with such ID exists:: %s", orderRequest.customerId())
-                ));
+                .orElseThrow(() -> {
+                    log.error("Customer with ID {} not found", orderRequest.customerId());
+                    return new MicroserviceBusinessException(
+                            String.format("No customer with such ID exists:: %s", orderRequest.customerId())
+                    );
+                });
+        log.info("Customer found: {}", customer);
 
-        if (orderRequest.orderStatus() != OrderStatus.UNFINISHED && orderRequest.orderStatus() != OrderStatus.CONFIRMED) {
+        // Validate order status
+        if (order.getOrderStatus() != OrderStatus.UNFINISHED && order.getOrderStatus() != OrderStatus.CONFIRMED) {
+            log.error("Invalid order status: {}. Must be UNFINISHED or CONFIRMED.", orderRequest.orderStatus());
             throw new IllegalArgumentException(
-                    format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderRequest.orderStatus())
+                    String.format("Invalid order status: %s. Must be either UNFINISHED or CONFIRMED.", orderRequest.orderStatus())
             );
         }
 
-        if (repository.existsById(orderRequest.orderId())) {
+        // Check if order already exists
+        if (orderRequest.orderId() != null && repository.existsById(orderRequest.orderId())) {
+            log.error("Order with ID {} already exists", orderRequest.orderId());
             throw new IllegalArgumentException(
-                    format("Order already exists with the provided ID:: %s", orderRequest.orderId())
+                    String.format("Order already exists with the provided ID:: %s", orderRequest.orderId())
             );
         }
+        log.info("Order ID is unique and valid.");
 
+        // Save order to repository
         UUID responseOrderId = repository.save(order).getOrderId();
+        log.info("Order saved with ID: {}", responseOrderId);
 
+        // Save each order item
         for (PurchaseRequest purchaseRequest : orderRequest.orderItems()) {
+            log.info("Processing order item with Product ID: {}", purchaseRequest.productId());
             orderItemService.saveOrderItem(
                     new OrderItemRequest(
                             null,
-                            order.getOrderId(),
+                            responseOrderId,
                             purchaseRequest.productId(),
                             purchaseRequest.quantity(),
                             purchaseRequest.unitPrice()
                     )
             );
+            log.info("Order item saved for Product ID: {}", purchaseRequest.productId());
         }
 
-        if (order.getOrderStatus() == PENDING) {
+        // Queue the order if status is PENDING
+        if (order.getOrderStatus() == OrderStatus.PENDING) {
+            log.info("Order status is PENDING; queuing order with ID: {}", order.getOrderId());
             queueUpOrder(order.getOrderId());
         }
 
+        log.info("Order creation completed successfully with Order ID: {}", responseOrderId);
         return responseOrderId;
     }
+
 
     public OrderResponse getOrderById(UUID orderId) {
         return repository.findById(orderId).map(mapper::toOrderResponse)

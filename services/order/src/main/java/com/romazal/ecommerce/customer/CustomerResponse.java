@@ -1,9 +1,13 @@
 package com.romazal.ecommerce.customer;
 
 public record CustomerResponse(
-        String customerId,
+        Long customerId,
+        String username,
         String firstname,
         String lastname,
-        String email
+        String phoneNumber,
+        String email,
+        String shippingAddress,
+        String billingAddress
 ) {
 }

@@ -21,7 +21,6 @@ public record OrderRequest(
                 message = "Total amount must be greater than 0")
         BigDecimal totalAmount,
 
-        @NotNull(message = "Payment status is required")
         PaymentStatus paymentStatus,
 
         OrderStatus orderStatus,

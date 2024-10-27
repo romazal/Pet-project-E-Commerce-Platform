@@ -1,6 +1,5 @@
 package com.romazal.ecommerce.product;
 
-import com.romazal.ecommerce.category.Category;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;

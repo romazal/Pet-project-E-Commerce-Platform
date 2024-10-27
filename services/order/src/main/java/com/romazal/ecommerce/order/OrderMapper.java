@@ -1,8 +1,12 @@
 package com.romazal.ecommerce.order;
 
+import com.romazal.ecommerce.orderItem.OrderItemsStatus;
 import com.romazal.ecommerce.payment.PaymentRequest;
 import com.romazal.ecommerce.shipping.ShippingCreationRequest;
 import org.springframework.stereotype.Service;
+
+import static com.romazal.ecommerce.order.OrderStatus.UNFINISHED;
+import static com.romazal.ecommerce.orderItem.OrderItemsStatus.UNRESERVED;
 
 @Service
 public class OrderMapper {
@@ -17,6 +21,8 @@ public class OrderMapper {
                 .orderStatus(orderRequest.orderStatus())
                 .paymentMethod(orderRequest.paymentMethod())
                 .shippingAddress(orderRequest.shippingAddress())
+                .orderStatus(orderRequest.orderStatus() == null ? UNFINISHED : orderRequest.orderStatus())
+                .orderItemsStatus(UNRESERVED)
                 .build();
 
     }

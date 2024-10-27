@@ -50,7 +50,7 @@ public class EmailService {
         final String templateName = PRODUCT_THRESHOLD_NOTIFICATION.getTemplate();
 
         Map<String, Object> variables = new HashMap<>();
-        variables.put("vendorName", storeName);
+        variables.put("storeName", storeName);
         variables.put("productName", productName);
         variables.put("productId", productId);
         variables.put("sku", sku);

@@ -39,7 +39,7 @@ public class Payment {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private PaymentStatus paymentStatus = PENDING;
+    private PaymentStatus paymentStatus;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

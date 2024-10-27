@@ -15,7 +15,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Modifying
     @Transactional
     @Query("UPDATE Payment p SET p.paymentStatus = 'FAILED' WHERE p.orderId = :orderId AND p.paymentStatus = 'PENDING'")
-    long updatePendingPaymentStatusToFailedByOrderId (@Param("orderId") UUID orderId);
+    int updatePendingPaymentStatusToFailedByOrderId (@Param("orderId") UUID orderId);
 
     Optional<Payment> findFirstByOrderIdOrderByCreatedDateDesc(UUID orderId);
 

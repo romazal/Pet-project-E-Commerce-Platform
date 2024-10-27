@@ -44,7 +44,7 @@ public class Order {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private OrderStatus orderStatus = UNFINISHED;
+    private OrderStatus orderStatus;
 
     @Enumerated(STRING)
     @Column(nullable = false)
@@ -52,7 +52,7 @@ public class Order {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private OrderItemsStatus orderItemsStatus = UNRESERVED;
+    private OrderItemsStatus orderItemsStatus;
 
     @Column(nullable = false)
     private String shippingAddress;
