@@ -2,7 +2,7 @@ services:
 
   # MySQL for Vendor and Customer Databases
   mysql:
-    image: mysql
+    image: mysql:latest
     container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
@@ -21,7 +21,7 @@ services:
     image: adminer
     container_name: adminer
     ports:
-      - "8080:8080"
+      - "8025:8080"
     networks:
       - ecommerce-network
     depends_on:
@@ -29,7 +29,7 @@ services:
 
   # PostgreSQL for Orders, Products and Supply Chain/Delivery Databases
   postgres:
-    image: postgres
+    image: postgres:latest
     container_name: postgres-db
     environment:
       POSTGRES_USER: romazal
@@ -106,43 +106,54 @@ services:
     depends_on:
       - mongo
 
-  # Kafka for Event-driven communication in KRaft mode (without Zookeeper)
-  kafka:
-    image: 'bitnami/kafka:latest'
-    container_name: kafka
+  # Kafka broker for Event-driven communication in KRaft mode (without Zookeeper)
+  broker:
+    image: apache/kafka:latest
+    hostname: broker
+    container_name: broker
     ports:
-      - '9094:9094'
+      - 9092:9092
     environment:
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_CONTROLLER_BROKER_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-    volumes:
-      - kafka-data:/bitnami/kafka/data
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     networks:
       - ecommerce-network
 
-  # Kafka UI for Kafka Management
-  kafka-ui:
-    image: 'provectuslabs/kafka-ui'
-    container_name: kafka-ui
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_USERNAME=romazal
-      - KAFKA_CLUSTERS_0_PASSWORD=123456
+#  kafdrop:
+#    image: obsidiandynamics/kafdrop:latest
+#    container_name: kafdrop
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      KAFKA_SERVERS: "broker:29092"
+#    networks:
+#      - ecommerce-network
+
+  # MailDev for capturing and testing outbound emails in development
+  mail-dev:
+    container_name: ms_mail_dev
+    image: maildev/maildev
     ports:
-      - "8082:8080"
+      - "1080:1080"
+      - "1025:1025"
     networks:
       - ecommerce-network
-    depends_on:
-      - kafka
 
-  # Zipkin for distributed tracing and performance monitoring.
+
+  # Zipkin for distributed tracing and performance monitoring
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
@@ -161,4 +172,4 @@ volumes:
   mysql-data:
   postgres-data:
   mongo-data:
-  kafka-data:
+#  kafka-data:

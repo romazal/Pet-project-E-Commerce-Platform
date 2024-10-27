@@ -9,21 +9,11 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-#  kafka:
-#    producer:
-#      bootstrap-servers: localhost:9092
-#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#      properties:
-#        spring.json.type.mapping: paymentConfirmation:com.romazal.ecommerce.notification.PaymentNotificationRequest
-#application:
-#  config:
-#    product-url: http://localhost:4500/api/v1/products
-
-application:
-  config:
-    order-url: http://localhost:4050/api/v1/orders
 
 
 server:
   port: 4060
+
+application:
+  config:
+    order-url: http://localhost:4050/api/v1/orders

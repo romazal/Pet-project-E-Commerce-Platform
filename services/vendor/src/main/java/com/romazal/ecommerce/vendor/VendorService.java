@@ -96,4 +96,11 @@ public class VendorService {
     public List getAllProductsByVendorId(Long vendorId) {
         return productClient.getAllProductsByVendorId(vendorId);
     }
+
+    public VendorContactResponse getVendorContactsByVendorId(Long vendorId) {
+        return repository.findById(vendorId).map(mapper::toVendorContactResponse)
+                .orElseThrow(() -> new VendorNotFoundException(
+                        format("No vendor found with the provided ID:: %s", vendorId)
+                ));
+    }
 }

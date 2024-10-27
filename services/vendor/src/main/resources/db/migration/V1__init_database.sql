@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS vendor_profiles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    store_name VARCHAR(255) NOT NULL,
+    business_license_number VARCHAR(255) NOT NULL,
+    store_address VARCHAR(255) NOT NULL,
+    store_phone VARCHAR(15) NOT NULL,
+    store_email VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    status ENUM('ACTIVE', 'SUSPENDED') NOT NULL DEFAULT 'ACTIVE',
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

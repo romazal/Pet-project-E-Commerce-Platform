@@ -37,4 +37,15 @@ public class VendorMapper {
         );
 
     }
+
+    public VendorContactResponse toVendorContactResponse(Vendor vendor) {
+        if(vendor == null) return null;
+
+        return new VendorContactResponse(
+            vendor.getStoreName(),
+            vendor.getStoreAddress(),
+            vendor.getStorePhone(),
+            vendor.getStoreEmail()
+        );
+    }
 }

@@ -3,6 +3,10 @@ package com.romazal.ecommerce.product;
 import com.romazal.ecommerce.category.Category;
 import com.romazal.ecommerce.exception.ProductNotFoundException;
 import com.romazal.ecommerce.exception.ProductPurchaseException;
+import com.romazal.ecommerce.kafka.NotificationKafkaTemplate;
+import com.romazal.ecommerce.kafka.ProductThresholdNotification;
+import com.romazal.ecommerce.vendor.VendorClient;
+import com.romazal.ecommerce.vendor.VendorContactResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,8 @@ public class ProductService {
 
     private final ProductRepository repository;
     private final ProductMapper mapper;
+    private final VendorClient vendorClient;
+    private final NotificationKafkaTemplate notificationKafkaTemplate;
 
 
     public UUID addProduct(ProductRequest productRequest) {
@@ -131,13 +137,30 @@ public class ProductService {
                         "Insufficient stock remaining quantity of product with ID:: " + productRequest.productId()
                 );
             }
+
             var newAvailableQuantity = product.getStockQuantity() - productRequest.quantity();
             product.setStockQuantity(newAvailableQuantity);
             repository.save(product);
             purchasedProducts.add(mapper.toProductPurchaseResponse(product, productRequest.quantity()));
+
+            if(product.getStockQuantity() <= product.getThresholdQuantity()) {
+                VendorContactResponse vendorContacts = vendorClient.getVendorContactsByVendorId(product.getVendorId());
+
+                notificationKafkaTemplate.sendProductThresholdNotification(
+                        new ProductThresholdNotification(
+                            product.getProductId(),
+                            product.getName(),
+                            product.getSku(),
+                            product.getStockQuantity(),
+                            product.getThresholdQuantity(),
+                            vendorContacts.storeName(),
+                            vendorContacts.storeEmail()
+                        )
+                );
+            }
         }
 
-        //todo threshold quantity notification
+
 
         return purchasedProducts;
     }

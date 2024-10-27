@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Threshold Notification</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: 30px auto;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        p {
+            color: #34495e;
+            font-size: 16px;
+        }
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Threshold Notification</h1>
+        <p>Dear <span class="highlight">{{storeName}}</span>,</p>
+        <p>We would like to inform you that the current stock quantity for the product <span class="highlight">{{productName}}</span> (ID: <span class="highlight">{{productId}}</span>, SKU: <span class="highlight">{{sku}}</span>) has fallen below the specified threshold value.</p>
+        <p>Current Stock Quantity: <span class="highlight">{{stockQuantity}}</span><br>
+            Threshold Quantity: <span class="highlight">{{thresholdQuantity}}</span></p>
+        <p>Please take the necessary actions to restock the product.</p>
+        <a href="https://localhost:4040/api/v1/products/{{productId}}" class="button">View Product</a>
+        <div class="footer">
+            <p>Thank you for your attention!</p>
+            <p>Best regards,<br>Your E-commerce Team</p>
+        </div>
+    </div>
+</body>
+</html>

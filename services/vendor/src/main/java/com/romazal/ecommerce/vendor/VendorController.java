@@ -51,5 +51,10 @@ public class VendorController {
         return ResponseEntity.ok(service.getAllProductsByVendorId(vendorId));
     }
 
+    @GetMapping("/contacts/{vendor-id}")
+    public ResponseEntity<VendorContactResponse> getVendorContactsByVendorId(@PathVariable("vendor-id") Long vendorId){
+        return ResponseEntity.ok(service.getVendorContactsByVendorId(vendorId));
+    }
+
 
 }
