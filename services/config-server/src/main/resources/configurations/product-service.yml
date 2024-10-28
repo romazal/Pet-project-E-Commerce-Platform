@@ -16,6 +16,11 @@ spring:
     baseline-version: 0
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
   kafka:
     producer:
       bootstrap-servers: localhost:9092

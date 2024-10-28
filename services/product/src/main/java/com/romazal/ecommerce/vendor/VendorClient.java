@@ -11,4 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface VendorClient {
     @GetMapping("/contacts/{vendor-id}")
     VendorContactResponse getVendorContactsByVendorId(@PathVariable("vendor-id") Long vendorId);
+
+    @GetMapping("/exists/{vendor-id}")
+    Boolean existsById(@PathVariable("vendor-id") Long vendorId);
 }

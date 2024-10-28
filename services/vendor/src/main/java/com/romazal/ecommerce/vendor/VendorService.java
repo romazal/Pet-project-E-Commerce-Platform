@@ -103,4 +103,8 @@ public class VendorService {
                         format("No vendor found with the provided ID:: %s", vendorId)
                 ));
     }
+
+    public Boolean existsById(Long vendorId) {
+        return repository.existsById(vendorId);
+    }
 }

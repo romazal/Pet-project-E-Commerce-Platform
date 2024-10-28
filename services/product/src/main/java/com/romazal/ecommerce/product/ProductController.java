@@ -14,9 +14,15 @@ public class ProductController {
 
     private final ProductService service;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<UUID> addProduct(@RequestBody ProductRequest productRequest) {
         return ResponseEntity.ok(service.addProduct(productRequest));
+    }
+
+    @PostMapping("/create/all")
+    public ResponseEntity<Void> addAllProducts(@RequestBody List<ProductRequest> productRequests) {
+        service.addAllProducts(productRequests);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/{product-id}")

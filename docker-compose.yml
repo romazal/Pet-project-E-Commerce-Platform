@@ -27,7 +27,7 @@ services:
     depends_on:
       - mysql
 
-  # PostgreSQL for Orders, Products and Supply Chain/Delivery Databases
+  # PostgreSQL for Orders, Products, Payments, Shipments and Product Movements Databases
   postgres:
     image: postgres:latest
     container_name: postgres-db
@@ -60,17 +60,20 @@ services:
   redis:
     image: redis
     container_name: redis-cache
+    environment:
+      REDIS_PASSWORD: secret
     ports:
       - "6379:6379"
     networks:
       - ecommerce-network
 
   # RedisInsight for Redis Management
-  redisinsight:
-    image: redis/redisinsight
-    container_name: redisinsight
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+    restart: always
     ports:
-      - "8001:8001"
+      - "5540:5540"
     networks:
       - ecommerce-network
     depends_on:

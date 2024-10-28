@@ -30,6 +30,11 @@ public class VendorController {
         return ResponseEntity.ok(service.getAllVendors());
     }
 
+    @GetMapping("/exists/{vendor-id}")
+    public ResponseEntity<Boolean> existsById(@PathVariable("vendor-id") Long vendorId) {
+        return ResponseEntity.ok(service.existsById(vendorId));
+    }
+
     @PutMapping("/profiles")
     public ResponseEntity<Void> updateVendorById(
             @RequestBody @Valid VendorRequest vendorRequest

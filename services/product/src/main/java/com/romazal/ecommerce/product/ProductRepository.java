@@ -9,4 +9,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllProductsByVendorId(Long vendorId);
 
     List<Product> findAllByProductIdInOrderByProductId(List<UUID> productIds);
+
+    List<Product> findAllByProductIdIn(List<UUID> productIds);
 }

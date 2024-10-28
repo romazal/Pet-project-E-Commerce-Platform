@@ -12,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -27,21 +27,40 @@ public class ProductService {
 
     private final ProductRepository repository;
     private final ProductMapper mapper;
+    private final ProductCacheService productCacheService;
     private final VendorClient vendorClient;
     private final NotificationKafkaTemplate notificationKafkaTemplate;
 
 
     public UUID addProduct(ProductRequest productRequest) {
+        if(productRequest.productId() != null && repository.existsById(productRequest.productId())) {
+            log.error("Failed to add the product, a product with id {} already exists", productRequest.productId());
+            throw new IllegalArgumentException(
+                    format("Failed to add the product, a product with id %s already exists", productRequest.productId())
+            );
+
+        }
+
+        if(!vendorClient.existsById(productRequest.vendorId())) {
+            log.error("Failed to add the product, the vendor with id {} does not exist", productRequest.vendorId());
+            throw new IllegalArgumentException(
+                    format("Failed to add the product, the vendor does not exist with ID:: %s ", productRequest.vendorId())
+            );
+        }
+
         Product product = mapper.toProduct(productRequest);
         return repository.save(product).getProductId();
     }
 
+    public void addAllProducts(List<ProductRequest> productRequests) {
+        for (ProductRequest productRequest : productRequests) {
+            addProduct(productRequest);
+        }
+    }
 
     public ProductResponse getProductById(UUID productId) {
-        return repository.findById(productId).map(mapper::toProductResponse)
-                .orElseThrow(() -> new ProductNotFoundException(
-                        format("No product found with the provided ID:: %s", productId)
-                ));
+        var product = productCacheService.getProductById(productId);
+        return mapper.toProductResponse(product);
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -52,30 +71,45 @@ public class ProductService {
     }
 
     public void updateProduct(ProductRequest productRequest) {
+        if (productRequest.productId() == null) {
+            log.error("Failed to update the product, no productId provided");
+            throw new IllegalArgumentException(
+                    "Failed to update the product, no productId provided"
+            );
+        }
+
         var product = repository.findById(productRequest.productId())
                 .orElseThrow(() -> new ProductNotFoundException(
-                        format("No product found with the provided ID:: %s", productRequest.productId())
+                        format("Failed to update the product, no product found with ID:: %s ", productRequest.productId())
                 ));
 
         mergeProduct(product, productRequest);
-        repository.save(product);
+
+        productCacheService.updateProduct(product);
     }
 
     private void mergeProduct(Product product, ProductRequest productRequest) {
 
-        if(productRequest.vendorId() != null){
+        if (productRequest.vendorId() != null) {
+            if(!vendorClient.existsById(productRequest.vendorId())) {
+                log.error("Failed to update the product, the vendor with id {} does not exist", productRequest.vendorId());
+                throw new IllegalArgumentException(
+                        format("Failed to update the product, the vendor does not exist with ID:: %s ", productRequest.vendorId())
+                );
+            }
+
             product.setVendorId(productRequest.vendorId());
         }
 
-        if(isNotBlank(productRequest.description())){
+        if (isNotBlank(productRequest.description())) {
             product.setDescription(productRequest.description());
         }
 
-        if(productRequest.price() != null){
+        if (productRequest.price() != null) {
             product.setPrice(productRequest.price());
         }
 
-        if(productRequest.categoryId() != null){
+        if (productRequest.categoryId() != null) {
             product.setCategory(
                     new Category().builder()
                             .categoryId(productRequest.categoryId())
@@ -83,32 +117,32 @@ public class ProductService {
             );
         }
 
-        if(productRequest.stockQuantity() != null){
+        if (productRequest.stockQuantity() != null) {
             product.setStockQuantity(productRequest.stockQuantity());
         }
 
-        if(productRequest.thresholdQuantity() != null){
+        if (productRequest.thresholdQuantity() != null) {
             product.setThresholdQuantity(productRequest.thresholdQuantity());
         }
 
-        if(isNotBlank(productRequest.sku())){
+        if (isNotBlank(productRequest.sku())) {
             product.setSku(productRequest.sku());
         }
 
     }
 
     public void deleteProduct(UUID productId) {
-        if(!repository.existsById(productId)){
+        if (!repository.existsById(productId)) {
             throw new ProductNotFoundException(
                     format("No product found with the provided ID:: %s", productId)
             );
         }
 
-        repository.deleteById(productId);
+        productCacheService.deleteProduct(productId);
     }
 
     public List<ProductResponse> getAllProductsByVendorId(Long vendorId) {
-        return repository.findAllProductsByVendorId(vendorId)
+        return productCacheService.getAllProductsByVendorId(vendorId)
                 .stream()
                 .map(mapper::toProductResponse)
                 .toList();
@@ -120,27 +154,31 @@ public class ProductService {
         var productIds = request.stream()
                 .map(ProductPurchaseRequest::productId)
                 .toList();
-        log.debug("Collected product IDs from purchase requests: {}", productIds);
 
-        var storedProducts = repository.findAllByProductIdInOrderByProductId(productIds);
-        log.debug("Fetched {} products from repository matching IDs", storedProducts.size());
+        var storedProducts = repository.findAllByProductIdIn(productIds).stream()
+                .collect(Collectors.toMap(
+                        Product::getProductId,
+                        Function.identity()
+                ));
 
         if (productIds.size() != storedProducts.size()) {
             log.error("Mismatch in requested product count and stored products; some products do not exist.");
             throw new ProductPurchaseException("One or more products do not exist");
         }
 
-        var storedRequest = request.stream()
-                .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
-                .toList();
-        log.debug("Sorted purchase requests by product ID");
-
         var purchasedProducts = new ArrayList<ProductPurchaseResponse>();
 
-        for (int i = 0; i < storedProducts.size(); i++) {
-            var product = storedProducts.get(i);
-            var productRequest = storedRequest.get(i);
-            log.info("Processing purchase for Product ID: {}, Requested Quantity: {}", product.getProductId(), productRequest.quantity());
+        var productsToSave = new ArrayList<Product>();
+
+        for (ProductPurchaseRequest productRequest : request) {
+            var product = storedProducts.getOrDefault(productRequest.productId(), null);
+
+            if (product == null) {
+                log.error("Product with ID:: {} does not exist", productRequest.productId());
+                throw new ProductPurchaseException(
+                        format("Product with ID:: %s does not exist", productRequest.productId())
+                );
+            }
 
             if (product.getStockQuantity() < productRequest.quantity()) {
                 log.error("Insufficient stock for Product ID: {}; Available: {}, Requested: {}",
@@ -152,18 +190,15 @@ public class ProductService {
 
             var newAvailableQuantity = product.getStockQuantity() - productRequest.quantity();
             product.setStockQuantity(newAvailableQuantity);
-            repository.save(product);
-            log.info("Updated stock for Product ID: {}. New quantity: {}", product.getProductId(), newAvailableQuantity);
+            productsToSave.add(product);
 
             var response = mapper.toProductPurchaseResponse(product, productRequest.quantity());
             purchasedProducts.add(response);
-            log.debug("Added ProductPurchaseResponse for Product ID: {} with quantity: {}", product.getProductId(), productRequest.quantity());
 
             if (product.getStockQuantity() <= product.getThresholdQuantity()) {
                 log.warn("Stock for Product ID: {} has reached threshold. Initiating vendor notification.", product.getProductId());
 
                 VendorContactResponse vendorContacts = vendorClient.getVendorContactsByVendorId(product.getVendorId());
-                log.info("Fetched vendor contact for Vendor ID: {}", product.getVendorId());
 
                 notificationKafkaTemplate.sendProductThresholdNotification(
                         new ProductThresholdNotification(
@@ -179,6 +214,8 @@ public class ProductService {
                 log.info("Sent threshold notification for Product ID: {} to vendor store: {}", product.getProductId(), vendorContacts.storeName());
             }
         }
+
+        productCacheService.updateAllProducts(productsToSave);
 
         log.info("Completed product purchase process with {} purchased products", purchasedProducts.size());
         return purchasedProducts;
