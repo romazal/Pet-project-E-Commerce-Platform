@@ -7,7 +7,7 @@
     <file url="file://$PROJECT_DIR$/services/notification/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/order/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/payment/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/product-movements/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/product-movement/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/product/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/shipping/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/transactionHistory/src/main/java" charset="UTF-8" />

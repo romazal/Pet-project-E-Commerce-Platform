@@ -27,7 +27,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.type.mapping: productThresholdNotification:com.romazal.ecommerce.kafka.ProductThresholdNotification
+        spring.json.type.mapping: productThresholdNotification:com.romazal.ecommerce.kafka.notification.ProductThresholdNotification,productMovementRecord:com.romazal.ecommerce.kafka.product_movement.ProductMovementRecord
 
 server:
   port: 4040

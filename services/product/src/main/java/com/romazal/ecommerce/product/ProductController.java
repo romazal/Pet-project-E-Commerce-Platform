@@ -41,6 +41,12 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/restock")
+    public ResponseEntity<Void> restockProduct(@RequestBody ProductRestockRequest productRestockRequest) {
+        service.restockProduct(productRestockRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{product-id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("product-id") UUID productId) {
         service.deleteProduct(productId);

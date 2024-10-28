@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.productMovement;
+package com.romazal.ecommerce.product_movement;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

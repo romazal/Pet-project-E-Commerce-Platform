@@ -15,9 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.romazal.ecommerce.order.OrderStatus.*;
-import static com.romazal.ecommerce.orderItem.OrderItemsStatus.UNRESERVED;
-import static jakarta.persistence.EnumType.*;
+import static jakarta.persistence.EnumType.STRING;
 
 @NoArgsConstructor
 @AllArgsConstructor

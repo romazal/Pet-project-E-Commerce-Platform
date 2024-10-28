@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.kafka;
+package com.romazal.ecommerce.kafka.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

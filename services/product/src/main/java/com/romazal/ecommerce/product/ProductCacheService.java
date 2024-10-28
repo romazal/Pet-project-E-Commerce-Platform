@@ -20,7 +20,7 @@ public class ProductCacheService {
 
     private final ProductRepository repository;
 
-    @Cacheable(value = "products", key = "#productId")
+    @Cacheable(value = "products", key = "#productId", unless = "#result == null")
     public Product getProductById(UUID productId) {
         log.info("Fetching product with ID:: {} from PostgreSQL repository", productId);
         return repository.findById(productId)
@@ -30,8 +30,8 @@ public class ProductCacheService {
     }
 
     @CachePut(value = "products", key = "#product.getProductId()")
-    public void updateProduct(Product product) {
-        repository.save(product);
+    public Product updateProduct(Product product) {
+        return repository.save(product);
     }
 
     public void updateAllProducts(List<Product> products) {

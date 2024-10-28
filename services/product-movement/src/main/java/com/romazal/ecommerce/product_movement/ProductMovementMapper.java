@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.productMovement;
+package com.romazal.ecommerce.product_movement;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ public class ProductMovementMapper {
         return new ProductMovementResponse(
                 productMovement.getProductMovementId(),
                 productMovement.getProductId(),
-                productMovement.getQuantity(),
+                productMovement.getMovementQuantity(),
                 productMovement.getMovementType(),
                 productMovement.getCreatedDate()
         );

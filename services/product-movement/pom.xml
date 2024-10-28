@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.romazal</groupId>
-	<artifactId>product-movements</artifactId>
+	<artifactId>product-movement</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product-movements</name>
-	<description>product-movements</description>
+	<name>product-movement</name>
+	<description>product-movement</description>
 	<url/>
 	<licenses>
 		<license/>

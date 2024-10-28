@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.productMovement;
+package com.romazal.ecommerce.kafka.product_movement;
 
 public enum MovementType {
     PURCHASE,

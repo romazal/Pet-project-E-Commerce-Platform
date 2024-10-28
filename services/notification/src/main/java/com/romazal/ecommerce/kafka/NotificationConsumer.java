@@ -23,7 +23,7 @@ public class NotificationConsumer {
     private final EmailService emailService;
 
     @KafkaListener(topics = "product-threshold-topic")
-    public void consumePaymentConfirmationNotification(ProductThresholdNotification productThresholdNotification) throws MessagingException {
+    public void consumeProductThresholdNotification(ProductThresholdNotification productThresholdNotification) throws MessagingException {
         log.info("Consuming the message from product-threshold-topic Topic:: {}", productThresholdNotification);
 
         repository.save(

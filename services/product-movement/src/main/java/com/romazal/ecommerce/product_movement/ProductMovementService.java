@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.productMovement;
+package com.romazal.ecommerce.product_movement;
 
 import com.romazal.ecommerce.exception.ProductMovementNotFoundException;
 import lombok.RequiredArgsConstructor;

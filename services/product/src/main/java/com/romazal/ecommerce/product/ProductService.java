@@ -3,8 +3,10 @@ package com.romazal.ecommerce.product;
 import com.romazal.ecommerce.category.Category;
 import com.romazal.ecommerce.exception.ProductNotFoundException;
 import com.romazal.ecommerce.exception.ProductPurchaseException;
-import com.romazal.ecommerce.kafka.NotificationKafkaTemplate;
-import com.romazal.ecommerce.kafka.ProductThresholdNotification;
+import com.romazal.ecommerce.kafka.notification.NotificationKafkaTemplate;
+import com.romazal.ecommerce.kafka.notification.ProductThresholdNotification;
+import com.romazal.ecommerce.kafka.product_movement.ProductMovementKafkaTemplate;
+import com.romazal.ecommerce.kafka.product_movement.ProductMovementRecord;
 import com.romazal.ecommerce.vendor.VendorClient;
 import com.romazal.ecommerce.vendor.VendorContactResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.romazal.ecommerce.kafka.product_movement.MovementType.PURCHASE;
+import static com.romazal.ecommerce.kafka.product_movement.MovementType.RESTOCK;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -30,10 +34,11 @@ public class ProductService {
     private final ProductCacheService productCacheService;
     private final VendorClient vendorClient;
     private final NotificationKafkaTemplate notificationKafkaTemplate;
+    private final ProductMovementKafkaTemplate productMovementKafkaTemplate;
 
 
     public UUID addProduct(ProductRequest productRequest) {
-        if(productRequest.productId() != null && repository.existsById(productRequest.productId())) {
+        if (productRequest.productId() != null && repository.existsById(productRequest.productId())) {
             log.error("Failed to add the product, a product with id {} already exists", productRequest.productId());
             throw new IllegalArgumentException(
                     format("Failed to add the product, a product with id %s already exists", productRequest.productId())
@@ -41,7 +46,7 @@ public class ProductService {
 
         }
 
-        if(!vendorClient.existsById(productRequest.vendorId())) {
+        if (!vendorClient.existsById(productRequest.vendorId())) {
             log.error("Failed to add the product, the vendor with id {} does not exist", productRequest.vendorId());
             throw new IllegalArgumentException(
                     format("Failed to add the product, the vendor does not exist with ID:: %s ", productRequest.vendorId())
@@ -91,7 +96,7 @@ public class ProductService {
     private void mergeProduct(Product product, ProductRequest productRequest) {
 
         if (productRequest.vendorId() != null) {
-            if(!vendorClient.existsById(productRequest.vendorId())) {
+            if (!vendorClient.existsById(productRequest.vendorId())) {
                 log.error("Failed to update the product, the vendor with id {} does not exist", productRequest.vendorId());
                 throw new IllegalArgumentException(
                         format("Failed to update the product, the vendor does not exist with ID:: %s ", productRequest.vendorId())
@@ -192,6 +197,18 @@ public class ProductService {
             product.setStockQuantity(newAvailableQuantity);
             productsToSave.add(product);
 
+            productMovementKafkaTemplate.sendProductMovementRecord(
+                    new ProductMovementRecord(
+                            product.getProductId(),
+                            productRequest.quantity(),
+                            product.getStockQuantity() + productRequest.quantity(),
+                            product.getStockQuantity(),
+                            PURCHASE
+                    )
+            );
+            log.info("Sent product movement record to Product Movement service. Product ID:: {}, movement type:: {}",
+                    product.getProductId(), PURCHASE);
+
             var response = mapper.toProductPurchaseResponse(product, productRequest.quantity());
             purchasedProducts.add(response);
 
@@ -219,6 +236,31 @@ public class ProductService {
 
         log.info("Completed product purchase process with {} purchased products", purchasedProducts.size());
         return purchasedProducts;
+    }
+
+    public void restockProduct(ProductRestockRequest productRestockRequest) {
+        var product = repository.findById(productRestockRequest.productId())
+                .orElseThrow(() -> new ProductNotFoundException(
+                        format("Failed to restock the product, no product found with ID:: %s ", productRestockRequest.productId())
+                ));
+
+        var newStockQuantity = product.getStockQuantity() + productRestockRequest.restockQuantity();
+
+        product.setStockQuantity(newStockQuantity);
+
+        productCacheService.updateProduct(product);
+
+        productMovementKafkaTemplate.sendProductMovementRecord(
+                new ProductMovementRecord(
+                        product.getProductId(),
+                        productRestockRequest.restockQuantity(),
+                        product.getStockQuantity() - productRestockRequest.restockQuantity(),
+                        product.getStockQuantity(),
+                        RESTOCK
+                )
+        );
+        log.info("Sent product movement record to Product Movement service. Product ID:: {}, movement type:: {}",
+                product.getProductId(), RESTOCK);
     }
 
 }

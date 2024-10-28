@@ -9,9 +9,16 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     @Bean
-    public NewTopic orderTopic() {
+    public NewTopic productThresholdTopic() {
         return TopicBuilder
                 .name("product-threshold-topic")
+                .build();
+    }
+
+    @Bean
+    public NewTopic productMovementTopic() {
+        return TopicBuilder
+                .name("product-movement-topic")
                 .build();
     }
 }

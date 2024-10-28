@@ -1,4 +1,4 @@
-package com.romazal.ecommerce.productMovement;
+package com.romazal.ecommerce.product_movement;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
