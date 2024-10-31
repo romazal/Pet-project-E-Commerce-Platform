@@ -9,11 +9,12 @@
         <module name="config-server" />
         <module name="notification" />
         <module name="product" />
-        <module name="shipping" />
+        <module name="shipment" />
         <module name="discovery" />
         <module name="vendor" />
         <module name="payment" />
         <module name="product-movement" />
+        <module name="gateway" />
         <module name="customer" />
         <module name="order" />
       </profile>
@@ -28,12 +29,13 @@
       <module name="config-server" options="-parameters" />
       <module name="customer" options="-parameters" />
       <module name="discovery" options="-parameters" />
+      <module name="gateway" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="order" options="-parameters" />
       <module name="payment" options="-parameters" />
       <module name="product" options="-parameters" />
       <module name="product-movement" options="-parameters" />
-      <module name="shipping" options="-parameters" />
+      <module name="shipment" options="-parameters" />
       <module name="transactionHistory" options="-parameters" />
       <module name="user" options="-parameters" />
       <module name="vendor" options="-parameters" />

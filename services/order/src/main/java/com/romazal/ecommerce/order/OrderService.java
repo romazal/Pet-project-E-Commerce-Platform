@@ -3,14 +3,13 @@ package com.romazal.ecommerce.order;
 import com.romazal.ecommerce.customer.CustomerClient;
 import com.romazal.ecommerce.exception.BusinessException;
 import com.romazal.ecommerce.exception.MicroserviceBusinessException;
-import com.romazal.ecommerce.orderItem.OrderItemMapper;
-import com.romazal.ecommerce.orderItem.OrderItemRequest;
-import com.romazal.ecommerce.orderItem.OrderItemService;
+import com.romazal.ecommerce.order_item.OrderItemMapper;
+import com.romazal.ecommerce.order_item.OrderItemRequest;
+import com.romazal.ecommerce.order_item.OrderItemService;
 import com.romazal.ecommerce.payment.PaymentClient;
-import com.romazal.ecommerce.payment.PaymentRequest;
 import com.romazal.ecommerce.product.ProductClient;
 import com.romazal.ecommerce.product.PurchaseRequest;
-import com.romazal.ecommerce.shipping.ShippingClient;
+import com.romazal.ecommerce.shipment.ShipmentClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.romazal.ecommerce.order.OrderStatus.*;
-import static com.romazal.ecommerce.orderItem.OrderItemsStatus.RESERVED;
-import static com.romazal.ecommerce.orderItem.OrderItemsStatus.UNRESERVED;
+import static com.romazal.ecommerce.order_item.OrderItemsStatus.RESERVED;
+import static com.romazal.ecommerce.order_item.OrderItemsStatus.UNRESERVED;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -37,7 +36,7 @@ public class OrderService {
     private final ProductClient productClient;
     private final CustomerClient customerClient;
     private final PaymentClient paymentClient;
-    private final ShippingClient shippingClient;
+    private final ShipmentClient shipmentClient;
     //private final OrderKafkaProducer orderKafkaProducer;
 
 
@@ -296,7 +295,7 @@ public class OrderService {
 
         var shippingResponse = mapper.toShippingResponse(order);
 
-        shippingClient.createShipping(shippingResponse);
+        shipmentClient.createShipping(shippingResponse);
 
         return repository.save(order).getOrderId();
     }

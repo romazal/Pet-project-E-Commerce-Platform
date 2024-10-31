@@ -1,12 +1,11 @@
 package com.romazal.ecommerce.order;
 
-import com.romazal.ecommerce.orderItem.OrderItemsStatus;
 import com.romazal.ecommerce.payment.PaymentRequest;
-import com.romazal.ecommerce.shipping.ShippingCreationRequest;
+import com.romazal.ecommerce.shipment.ShipmentCreationRequest;
 import org.springframework.stereotype.Service;
 
 import static com.romazal.ecommerce.order.OrderStatus.UNFINISHED;
-import static com.romazal.ecommerce.orderItem.OrderItemsStatus.UNRESERVED;
+import static com.romazal.ecommerce.order_item.OrderItemsStatus.UNRESERVED;
 
 @Service
 public class OrderMapper {
@@ -53,10 +52,10 @@ public class OrderMapper {
         );
     }
 
-    public ShippingCreationRequest toShippingResponse(Order order) {
+    public ShipmentCreationRequest toShippingResponse(Order order) {
         if (order == null) return null;
 
-        return new ShippingCreationRequest(
+        return new ShipmentCreationRequest(
                 order.getOrderId()
         );
     }

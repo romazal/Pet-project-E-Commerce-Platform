@@ -1,7 +1,7 @@
 package com.romazal.ecommerce.order;
 
-import com.romazal.ecommerce.orderItem.OrderItem;
-import com.romazal.ecommerce.orderItem.OrderItemsStatus;
+import com.romazal.ecommerce.order_item.OrderItem;
+import com.romazal.ecommerce.order_item.OrderItemsStatus;
 import com.romazal.ecommerce.payment.PaymentMethod;
 import com.romazal.ecommerce.payment.PaymentStatus;
 import jakarta.persistence.*;
@@ -38,6 +38,7 @@ public class Order {
     private BigDecimal totalAmount;
 
     @Enumerated(STRING)
+    @Column
     private PaymentStatus paymentStatus;
 
     @Enumerated(STRING)

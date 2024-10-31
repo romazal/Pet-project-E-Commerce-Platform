@@ -18,7 +18,7 @@ application:
     payment-url: http://localhost:4060/api/v1/payments
     product-url: http://localhost:4040/api/v1/products
     customer-url: http://localhost:4020/api/v1/customers
-    shipping-url: http://localhost:4070/api/v1/shippings
+    shipment-url: http://localhost:4070/api/v1/shipments
 
 #logging:
 #  level:

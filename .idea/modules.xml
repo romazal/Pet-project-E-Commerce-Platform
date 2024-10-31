@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Multi-Vendor E-Commerce Platform.iml" filepath="$PROJECT_DIR$/.idea/Multi-Vendor E-Commerce Platform.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/multi-vendor-ecommerce-platform.iml" filepath="$PROJECT_DIR$/.idea/multi-vendor-ecommerce-platform.iml" />
     </modules>
   </component>
 </project>
