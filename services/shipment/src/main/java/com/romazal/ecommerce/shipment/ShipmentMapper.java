@@ -19,6 +19,8 @@ public class ShipmentMapper {
 
         return new Shipment().builder()
                 .orderId(shipmentCreationRequest.orderId())
+                .customerEmail(shipmentCreationRequest.customerEmail())
+                .customerName(shipmentCreationRequest.customerName())
                 .build();
     }
 }

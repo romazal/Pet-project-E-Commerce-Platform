@@ -1,10 +1,14 @@
 package com.romazal.ecommerce.shipment;
 
 import com.romazal.ecommerce.exception.ShippingNotFoundException;
+import com.romazal.ecommerce.kafka.notification.NotificationKafkaTemplate;
+import com.romazal.ecommerce.kafka.notification.ShipmentDeliveredNotification;
+import com.romazal.ecommerce.kafka.notification.ShipmentShippedNotification;
 import com.romazal.ecommerce.order.OrderClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.romazal.ecommerce.shipment.DeliveryStatus.*;
@@ -17,73 +21,107 @@ public class ShipmentService {
     private final ShipmentRepository repository;
     private final ShipmentMapper mapper;
     private final OrderClient orderClient;
+    private final NotificationKafkaTemplate notificationKafkaTemplate;
 
     public UUID createShipping(ShipmentCreationRequest shipmentCreationRequest) {
-        var shipping = mapper.toShipping(shipmentCreationRequest);
+        if(repository.findFirstByOrderIdAndDeliveryStatusNot(shipmentCreationRequest.orderId(), FAILED).isEmpty()) {
+            throw new IllegalArgumentException(
+                    format("Shipment already exists for order ID:: %s", shipmentCreationRequest.orderId())
+            );
+        }
 
-        return repository.save(shipping).getShipmentId();
+        var shipment = mapper.toShipping(shipmentCreationRequest);
+
+        return repository.save(shipment).getShipmentId();
     }
 
     public UUID confirmShipping(ShipmentConfirmRequest shipmentConfirmRequest) {
-        var shipping = repository.findById(shipmentConfirmRequest.shippingId())
+        var shipment = repository.findById(shipmentConfirmRequest.shippingId())
                 .orElseThrow(() -> new ShippingNotFoundException(
                         format("No shipping found with the provided ID:: %s", shipmentConfirmRequest.shippingId())
                 ));
 
-        if (shipping.getDeliveryStatus() != PENDING) {
+        if (shipment.getDeliveryStatus() != PENDING) {
             throw new IllegalStateException(
-                    format("Cannot confirm the shipping, the shipping is no longer pending, current delivery status:: %s", shipping.getDeliveryStatus())
+                    format("Cannot confirm the shipping, the shipping is no longer pending, current delivery status:: %s", shipment.getDeliveryStatus())
             );
         }
 
-        shipping.setDeliveryStatus(SHIPPING);
+        shipment.setDeliveryStatus(SHIPPING);
+        shipment.setShippedDate(LocalDateTime.now());
 
-        orderClient.setOrderStatusToShipping(shipping.getOrderId());
+        orderClient.setOrderStatusToShipping(shipment.getOrderId());
 
-        return repository.save(shipping).getShipmentId();
+        notificationKafkaTemplate.sendShipmentShippedNotification(
+                new ShipmentShippedNotification(
+                        shipment.getShipmentId(),
+                        shipment.getOrderId(),
+                        shipment.getCustomerEmail(),
+                        shipment.getCustomerName(),
+                        shipment.getTrackingNumber(),
+                        shipment.getLogisticsProvider(),
+                        shipment.getShippedDate(),
+                        shipment.getEstimatedDeliveryDate()
+                )
+        );
+
+        return repository.save(shipment).getShipmentId();
     }
 
-    public UUID successShipping(UUID shippingId) {
-        var shipping = repository.findById(shippingId)
+    public UUID successShipping(UUID shipmentId) {
+        var shipment = repository.findById(shipmentId)
                 .orElseThrow(() -> new ShippingNotFoundException(
-                        format("No shipping found with the provided ID:: %s", shippingId)
+                        format("No shipping found with the provided ID:: %s", shipmentId)
                 ));
 
-        if (shipping.getDeliveryStatus() != SHIPPING) {
+        if (shipment.getDeliveryStatus() != SHIPPING) {
             throw new IllegalStateException(
-                    format("Cannot conclude the shipping, the shipping's delivery is not in shipping status, current delivery status:: %s", shipping.getDeliveryStatus())
+                    format("Cannot conclude the shipping, the shipping's delivery is not in shipping status, current delivery status:: %s", shipment.getDeliveryStatus())
             );
         }
 
-        shipping.setDeliveryStatus(DELIVERED);
+        shipment.setDeliveryStatus(DELIVERED);
+        shipment.setDeliveredDate(LocalDateTime.now());
 
-        orderClient.setOrderStatusToDelivered(shipping.getOrderId());
+        orderClient.setOrderStatusToDelivered(shipment.getOrderId());
 
-        return repository.save(shipping).getShipmentId();
+        notificationKafkaTemplate.sendShipmentDeliveredNotification(
+                new ShipmentDeliveredNotification(
+                        shipment.getShipmentId(),
+                        shipment.getOrderId(),
+                        shipment.getCustomerEmail(),
+                        shipment.getCustomerName(),
+                        shipment.getTrackingNumber(),
+                        shipment.getLogisticsProvider(),
+                        shipment.getDeliveredDate()
+                )
+        );
+
+        return repository.save(shipment).getShipmentId();
     }
 
-    public UUID failShipping(UUID shippingId) {
-        var shipping = repository.findById(shippingId)
+    public UUID failShipping(UUID shipmentId) {
+        var shipment = repository.findById(shipmentId)
                 .orElseThrow(() -> new ShippingNotFoundException(
-                        format("No shipping found with the provided ID:: %s", shippingId)
+                        format("No shipping found with the provided ID:: %s", shipmentId)
                 ));
 
-        if (shipping.getDeliveryStatus() == FAILED) {
+        if (shipment.getDeliveryStatus() == FAILED) {
             throw new IllegalStateException(
-                    format("Cannot fail the shipping, the shipping is already failed, current delivery status:: %s", shipping.getDeliveryStatus())
+                    format("Cannot fail the shipping, the shipping is already failed, current delivery status:: %s", shipment.getDeliveryStatus())
             );
         }
 
-        if (shipping.getDeliveryStatus() == DELIVERED) {
+        if (shipment.getDeliveryStatus() == DELIVERED) {
             throw new IllegalStateException(
-                    format("Cannot fail the shipping, the shipping is already successfully delivered, current delivery status:: %s", shipping.getDeliveryStatus())
+                    format("Cannot fail the shipping, the shipping is already successfully delivered, current delivery status:: %s", shipment.getDeliveryStatus())
             );
         }
 
-        shipping.setDeliveryStatus(FAILED);
+        shipment.setDeliveryStatus(FAILED);
 
-        orderClient.cancelOrder(shipping.getOrderId());
+        orderClient.cancelOrder(shipment.getOrderId());
 
-        return repository.save(shipping).getShipmentId();
+        return repository.save(shipment).getShipmentId();
     }
 }

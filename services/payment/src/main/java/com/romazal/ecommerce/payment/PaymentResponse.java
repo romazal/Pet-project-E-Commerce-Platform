@@ -8,6 +8,8 @@ public record PaymentResponse(
         UUID paymentId,
         UUID orderId,
         BigDecimal totalAmount,
+        String customerEmail,
+        String customerName,
         PaymentMethod paymentMethod,
         PaymentStatus paymentStatus,
         LocalDateTime createdDate,

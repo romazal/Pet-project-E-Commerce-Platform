@@ -7,17 +7,17 @@ spring:
       port: 27017
       database: notification
       authentication-database: admin
-      uri: mongodb://romazal:123456@localhost:27017/transaction_history?authSource=admin
+      uri: mongodb://romazal:123456@localhost:27017/notification?authSource=admin
   kafka:
     consumer:
       bootstrap-servers: localhost:9092
-      group-id: productGroup
+      group-id: productGroup,shipmentGroup
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: '*'
-        spring.json.type.mapping: productThresholdNotification:com.romazal.ecommerce.kafka.product.ProductThresholdNotification
+        spring.json.type.mapping: productThresholdNotification:com.romazal.ecommerce.kafka.product.ProductThresholdNotification,shipmentShippedNotification:com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification,shipmentDeliveredNotification:com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification
   mail:
     host: localhost
     port: 1025

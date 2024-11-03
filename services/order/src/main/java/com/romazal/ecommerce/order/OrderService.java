@@ -58,10 +58,10 @@ public class OrderService {
         log.info("Customer found: {}", customer);
 
         // Validate order status
-        if (order.getOrderStatus() != OrderStatus.UNFINISHED && order.getOrderStatus() != OrderStatus.CONFIRMED) {
-            log.error("Invalid order status: {}. Must be UNFINISHED or CONFIRMED.", orderRequest.orderStatus());
+        if (order.getOrderStatus() != UNFINISHED && order.getOrderStatus() != PENDING) {
+            log.error("Invalid order status: {}. Must be UNFINISHED or PENDING.", orderRequest.orderStatus());
             throw new IllegalArgumentException(
-                    String.format("Invalid order status: %s. Must be either UNFINISHED or CONFIRMED.", orderRequest.orderStatus())
+                    String.format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderRequest.orderStatus())
             );
         }
 
@@ -73,6 +73,9 @@ public class OrderService {
             );
         }
         log.info("Order ID is unique and valid.");
+
+        order.setCustomerEmail(customer.email());
+        order.setCustomerName(customer.firstname() + " " + customer.lastname());
 
         // Save order to repository
         UUID responseOrderId = repository.save(order).getOrderId();
@@ -132,7 +135,7 @@ public class OrderService {
             );
         }
 
-        if (orderUpdateRequest.orderStatus() != OrderStatus.UNFINISHED && orderUpdateRequest.orderStatus() != OrderStatus.CONFIRMED) {
+        if (orderUpdateRequest.orderStatus() != UNFINISHED && orderUpdateRequest.orderStatus() != OrderStatus.CONFIRMED) {
             throw new java.lang.IllegalArgumentException(
                     format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderUpdateRequest.orderStatus())
             );

@@ -13,6 +13,8 @@ public class PaymentMapper {
         return new Payment().builder()
                 .orderId(paymentRequest.orderId())
                 .totalAmount(paymentRequest.totalAmount())
+                .customerEmail(paymentRequest.customerEmail())
+                .customerName(paymentRequest.customerName())
                 .paymentMethod(paymentRequest.paymentMethod())
                 .paymentStatus(PENDING)
                 .build();
@@ -25,6 +27,8 @@ public class PaymentMapper {
                 payment.getPaymentId(),
                 payment.getOrderId(),
                 payment.getTotalAmount(),
+                payment.getCustomerEmail(),
+                payment.getCustomerName(),
                 payment.getPaymentMethod(),
                 payment.getPaymentStatus(),
                 payment.getCreatedDate(),

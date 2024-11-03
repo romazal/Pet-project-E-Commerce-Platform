@@ -8,6 +8,12 @@ import java.util.UUID;
 public record ShipmentCreationRequest(
         @NotNull(message = "Order ID is required")
         @Positive(message = "Order ID must be positive")
-        UUID orderId
+        UUID orderId,
+
+        @NotNull(message = "Customer Email is required")
+        String customerEmail,
+
+        @NotNull(message = "Customer Name is required")
+        String customerName
 ) {
 }

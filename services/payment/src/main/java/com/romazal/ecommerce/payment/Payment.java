@@ -33,6 +33,12 @@ public class Payment {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
+    @Column(nullable = false)
+    private String customerEmail;
+
+    @Column(nullable = false)
+    private String customerName;
+
     @Enumerated(STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;

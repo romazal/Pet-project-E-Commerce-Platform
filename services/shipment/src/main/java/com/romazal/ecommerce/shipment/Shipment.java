@@ -30,6 +30,12 @@ public class Shipment {
     private UUID orderId;
 
     @Column(nullable = false)
+    private String customerEmail;
+
+    @Column(nullable = false)
+    private String customerName;
+
+    @Column(nullable = false)
     private String trackingNumber;
 
     @Column(nullable = false)
