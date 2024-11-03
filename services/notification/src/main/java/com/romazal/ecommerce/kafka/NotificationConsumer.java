@@ -2,6 +2,7 @@ package com.romazal.ecommerce.kafka;
 
 import com.romazal.ecommerce.email.EmailService;
 import com.romazal.ecommerce.kafka.product.ProductThresholdNotification;
+import com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification;
 import com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification;
 import com.romazal.ecommerce.notification.Notification;
 import com.romazal.ecommerce.notification.NotificationRepository;
@@ -102,6 +103,43 @@ public class NotificationConsumer {
                 shipmentShippedNotification.logisticsProvider(),
                 shipmentShippedNotification.shippedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 shipmentShippedNotification.estimatedDeliveryDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        );
+    }
+
+    @KafkaListener(topics = "shipment-delivered-topic")
+    public void consumeShipmentDeliveredNotification(ShipmentDeliveredNotification shipmentDeliveredNotification) throws MessagingException {
+        log.info("Consuming the message from shipment-delivered-topic Topic:: {}", shipmentDeliveredNotification);
+
+        repository.save(
+                Notification.builder()
+                        .type(PRODUCT_THRESHOLD_NOTIFICATION)
+                        .destinationEmail(shipmentDeliveredNotification.customerEmail())
+                        .message(
+                                format(
+                                        """
+                                        Shipment Delivered Notification:
+                                        
+                                        The shipment for order ID: %s has been delivered.
+                                        
+                                        Delivered Date: %s
+                                        """,
+                                        shipmentDeliveredNotification.orderId(),
+                                        shipmentDeliveredNotification.deliveredDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                                )
+                        )
+                        .notificationDate(LocalDateTime.now())
+                        .shipmentDeliveredNotification(shipmentDeliveredNotification)
+                        .build()
+        );
+
+        emailService.sendShipmentDeliveredNotificationEmail(
+                shipmentDeliveredNotification.customerEmail(),
+                shipmentDeliveredNotification.shipmentId(),
+                shipmentDeliveredNotification.orderId(),
+                shipmentDeliveredNotification.customerName(),
+                shipmentDeliveredNotification.trackingNumber(),
+                shipmentDeliveredNotification.logisticsProvider(),
+                shipmentDeliveredNotification.deliveredDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         );
     }
 

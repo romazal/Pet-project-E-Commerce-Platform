@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.notification;
 
 import com.romazal.ecommerce.kafka.product.ProductThresholdNotification;
+import com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification;
 import com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -29,4 +30,6 @@ public class Notification {
     private ProductThresholdNotification productThresholdNotification;
 
     private ShipmentShippedNotification shipmentShippedNotification;
+
+    private ShipmentDeliveredNotification shipmentDeliveredNotification;
 }

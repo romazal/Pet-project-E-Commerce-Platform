@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shipment Shipped Notification</title>
-    <style>
+    <title>Shipment Delivered Notification</title>
+    <style type="text/css">
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -88,24 +88,24 @@
 </head>
 <body>
 <div class="container">
-    <h1>Your Order Has Been Shipped!</h1>
+    <h1>Your Order Has Been Delivered!</h1>
     <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
-    <p>We’re pleased to inform you that your shipment for order ID <span class="highlight" th:text="${orderId}"></span> has been initiated.</p>
+    <p>Your shipment for order ID <span class="highlight" th:text="${orderId}"></span> has been successfully delivered.</p>
 
-    <p>Shipment Details:</p>
+    <p>Delivery Details:</p>
     <ul>
         <li>Shipment ID: <span class="highlight" th:text="${shipmentId}"></span></li>
         <li>Tracking Number: <span class="highlight" th:text="${trackingNumber}"></span></li>
         <li>Logistics Provider: <span class="highlight" th:text="${logisticsProvider}"></span></li>
-        <li>Shipped Date: <span class="highlight" th:text="${shippedDate}"></span></li>
-        <li>Estimated Delivery Date: <span class="highlight" th:text="${estimatedDeliveryDate}"></span></li>
+        <li>Delivered Date: <span class="highlight" th:text="${deliveredDate}"></span></li>
     </ul>
 
-    <p>To track your shipment, click the button below:</p>
-    <a th:href="@{https://localhost:4220/api/v1/track/${trackingNumber}}" class="button">Track Shipment</a>
+    <a th:href="@{https://localhost:4050/api/v1/track/${orderId}}" class="button">View Order</a>
+
+    <p>If you have any questions, please contact our support team.</p>
 
     <div class="footer">
-        <p>Thank you for shopping with us!</p>
+        <p>Thank you for choosing us!</p>
         <p>Best regards,<br>Your E-commerce Team</p>
     </div>
 </div>
