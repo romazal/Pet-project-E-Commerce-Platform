@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Shipped Notification</title>
+    <style>
+        /* Reset body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Main container */
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: 30px auto;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        /* Paragraph styling */
+        p {
+            color: #34495e;
+            font-size: 16px;
+        }
+
+        /* Highlight important text */
+        .highlight {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        /* List styling for shipment details */
+        ul {
+            padding-left: 20px;
+            color: #34495e;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+
+        ul li {
+            margin: 8px 0;
+        }
+
+        /* Footer styling */
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        /* Footer paragraph styling */
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Button styling */
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Button hover effect */
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Media query for mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            p, ul, .footer {
+                font-size: 14px;
+            }
+            .button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Your Order Has Been Shipped</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>We’re pleased to inform you that your shipment for order ID <span class="highlight" th:text="${orderId}"></span> has been initiated.</p>
+
+    <p>Shipment Details:</p>
+    <ul>
+        <li>Shipment ID: <span class="highlight" th:text="${shipmentId}"></span></li>
+        <li>Tracking Number: <span class="highlight" th:text="${trackingNumber}"></span></li>
+        <li>Logistics Provider: <span class="highlight" th:text="${logisticsProvider}"></span></li>
+        <li>Shipped Date: <span class="highlight" th:text="${shippedDate}"></span></li>
+        <li>Estimated Delivery Date: <span class="highlight" th:text="${estimatedDeliveryDate}"></span></li>
+    </ul>
+
+    <p>To track your shipment, click the button below:</p>
+    <a th:href="@{https://localhost:4220/api/v1/track/${trackingNumber}}" class="button">Track Shipment</a>
+
+    <div class="footer">
+        <p>Thank you for shopping with us!</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>
