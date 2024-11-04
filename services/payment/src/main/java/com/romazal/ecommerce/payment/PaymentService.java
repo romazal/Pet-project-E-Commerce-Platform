@@ -1,9 +1,14 @@
 package com.romazal.ecommerce.payment;
 
 import com.romazal.ecommerce.exception.PaymentNotFoundException;
+import com.romazal.ecommerce.kafka.notification.NotificationKafkaTemplate;
+import com.romazal.ecommerce.kafka.notification.PaymentConfirmationNotification;
+import com.romazal.ecommerce.kafka.notification.PaymentRefundNotification;
+import com.romazal.ecommerce.order.OrderClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,6 +22,8 @@ public class PaymentService {
 
     private final PaymentRepository repository;
     private final PaymentMapper mapper;
+    private final OrderClient orderClient;
+    private final NotificationKafkaTemplate notificationKafkaTemplate;
 
 
     public UUID createPayment(PaymentRequest paymentRequest) {
@@ -41,8 +48,18 @@ public class PaymentService {
 
         payment.setPaymentStatus(PAID);
 
-        //todo
-        //orderClient.confirmOrder(payment.getOrderId());
+        orderClient.confirmOrder(payment.getOrderId());
+
+        notificationKafkaTemplate.sendPaymentConfirmationNotification(
+                new PaymentConfirmationNotification(
+                      payment.getPaymentId(),
+                      payment.getOrderId(),
+                      payment.getTotalAmount(),
+                      payment.getCustomerEmail(),
+                      payment.getCustomerName(),
+                      payment.getPaymentMethod()
+                )
+        );
 
         return repository.save(payment).getPaymentId();
     }
@@ -77,6 +94,16 @@ public class PaymentService {
         }
 
         payment.setPaymentStatus(REFUNDED);
+
+        notificationKafkaTemplate.sendPaymentRefundNotification(
+                new PaymentRefundNotification(
+                        payment.getPaymentId(),
+                        payment.getOrderId(),
+                        payment.getTotalAmount(),
+                        payment.getCustomerEmail(),
+                        payment.getCustomerName()
+                )
+        );
 
         return repository.save(payment).getPaymentId();
     }
