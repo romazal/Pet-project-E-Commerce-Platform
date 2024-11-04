@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "customer_profiles")
+@Table(name = "customers")
 public class Customer {
 
     @Id

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record OrderItemResponse(
         UUID orderItemId,
-        UUID order,
+        UUID orderId,
         UUID productId,
         Double quantity,
         BigDecimal unitPrice

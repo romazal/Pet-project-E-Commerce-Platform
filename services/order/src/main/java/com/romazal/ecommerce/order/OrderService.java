@@ -3,6 +3,10 @@ package com.romazal.ecommerce.order;
 import com.romazal.ecommerce.customer.CustomerClient;
 import com.romazal.ecommerce.exception.BusinessException;
 import com.romazal.ecommerce.exception.MicroserviceBusinessException;
+import com.romazal.ecommerce.kafka.notification.NotificationKafkaTemplate;
+import com.romazal.ecommerce.kafka.notification.OrderCancellationNotification;
+import com.romazal.ecommerce.kafka.notification.OrderConfirmationNotification;
+import com.romazal.ecommerce.kafka.notification.OrderPaymentLinkNotification;
 import com.romazal.ecommerce.order_item.OrderItemMapper;
 import com.romazal.ecommerce.order_item.OrderItemRequest;
 import com.romazal.ecommerce.order_item.OrderItemService;
@@ -14,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,6 +26,8 @@ import java.util.stream.Collectors;
 import static com.romazal.ecommerce.order.OrderStatus.*;
 import static com.romazal.ecommerce.order_item.OrderItemsStatus.RESERVED;
 import static com.romazal.ecommerce.order_item.OrderItemsStatus.UNRESERVED;
+import static com.romazal.ecommerce.payment.PaymentStatus.PENDING;
+import static com.romazal.ecommerce.payment.PaymentStatus.REFUNDED;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -37,8 +44,7 @@ public class OrderService {
     private final CustomerClient customerClient;
     private final PaymentClient paymentClient;
     private final ShipmentClient shipmentClient;
-    //private final OrderKafkaProducer orderKafkaProducer;
-
+    private final NotificationKafkaTemplate notificationKafkaTemplate;
 
     public UUID createOrder(OrderRequest orderRequest) {
         log.info("Starting to create order for customer ID: {}", orderRequest.customerId());
@@ -58,7 +64,7 @@ public class OrderService {
         log.info("Customer found: {}", customer);
 
         // Validate order status
-        if (order.getOrderStatus() != UNFINISHED && order.getOrderStatus() != PENDING) {
+        if (order.getOrderStatus() != UNFINISHED && order.getOrderStatus() != OrderStatus.PENDING) {
             log.error("Invalid order status: {}. Must be UNFINISHED or PENDING.", orderRequest.orderStatus());
             throw new IllegalArgumentException(
                     String.format("Invalid order status: %s. Must be either UNFINISHED or PENDING.", orderRequest.orderStatus())
@@ -143,7 +149,7 @@ public class OrderService {
 
         mergeOrder(order, orderUpdateRequest);
 
-        if (order.getOrderStatus() == PENDING) {
+        if (order.getOrderStatus() == OrderStatus.PENDING) {
             queueUpOrder(order.getOrderId());
         }
 
@@ -224,11 +230,49 @@ public class OrderService {
         if (order.getOrderStatus() == UNFINISHED) {
             deleteOrder(orderId);
             return;
+        } else if (order.getOrderStatus() == CANCELED) {
+            return;
+        }
+
+        if (
+            order.getOrderStatus() == DELIVERED &&
+            order.getLastModifiedDate().plusWeeks(2).isAfter(LocalDateTime.now())
+        ) {
+            throw new BusinessException(
+                    format("Cannot cancel the order, it's been more then two weeks after receiving the products of the order")
+            );
+        }
+
+        if (order.getPaymentStatus() == PENDING || order.getPaymentStatus() == REFUNDED) {
+            paymentClient.refundPaymentByOrderId(order.getOrderId());
+        }
+
+        if (order.getOrderStatus() == CONFIRMED || order.getOrderStatus() == SHIPPED || order.getOrderStatus() == DELIVERED) {
+            shipmentClient.refundShipmentByOrderId(order.getOrderId());
+        }
+
+        var orderItems = orderItemService.getAllOrderItemsByOrderIdToPurchaseRequest(orderId);
+
+        if (order.getOrderItemsStatus() == RESERVED) {
+            productClient.refundProducts(orderItems);
+
+            order.setOrderItemsStatus(UNRESERVED);
         }
 
         order.setOrderStatus(CANCELED);
 
-        //todo
+        notificationKafkaTemplate.sendOrderCancellationNotification(
+                new OrderCancellationNotification(
+                        order.getOrderId(),
+                        order.getCustomerEmail(),
+                        order.getCustomerName(),
+                        order.getTotalAmount(),
+                        orderItems,
+                        order.getCreatedDate()
+                )
+        );
+
+        repository.save(order);
     }
 
     public UUID queueUpOrder(UUID orderId) {
@@ -238,9 +282,9 @@ public class OrderService {
 
         if (
                 order.getOrderStatus() == CONFIRMED
-                || order.getOrderStatus() == SHIPPED
-                || order.getOrderStatus() == DELIVERED
-                || order.getOrderStatus() == CANCELED
+                        || order.getOrderStatus() == SHIPPED
+                        || order.getOrderStatus() == DELIVERED
+                        || order.getOrderStatus() == CANCELED
         ) {
             throw new BusinessException(
                     format("Order is already confirmed, current status:: %s,", order.getOrderStatus())
@@ -248,21 +292,29 @@ public class OrderService {
         }
 
         if (order.getOrderItemsStatus() == UNRESERVED) {
-            var purchasedProducts = productClient.purchaseProducts(
-                    orderItemService.getAllOrderItemsByOrderId(orderId)
-                            .stream()
-                            .map(orderItemMapper::toPurchaseRequest)
-                            .toList()
+            productClient.purchaseProducts(
+                    orderItemService.getAllOrderItemsByOrderIdToPurchaseRequest(orderId)
             );
 
             order.setOrderItemsStatus(RESERVED);
         }
 
-        order.setOrderStatus(PENDING);
+        order.setOrderStatus(OrderStatus.PENDING);
 
         var paymentResponse = mapper.toPaymentResponse(order);
 
-        paymentClient.createPayment(paymentResponse);
+        UUID paymentId = paymentClient.createPayment(paymentResponse);
+
+        notificationKafkaTemplate.sendOrderPaymentLinkNotification(
+                new OrderPaymentLinkNotification(
+                        order.getOrderId(),
+                        paymentId,
+                        order.getCustomerEmail(),
+                        order.getCustomerName(),
+                        order.getTotalAmount(),
+                        orderItemService.getAllOrderItemsByOrderIdToPurchaseRequest(order.getOrderId())
+                )
+        );
 
         return repository.save(order).getOrderId();
     }
@@ -284,11 +336,8 @@ public class OrderService {
         }
 
         if (order.getOrderItemsStatus() == UNRESERVED) {
-            var purchasedProducts = productClient.purchaseProducts(
-                    orderItemService.getAllOrderItemsByOrderId(orderId)
-                            .stream()
-                            .map(orderItemMapper::toPurchaseRequest)
-                            .toList()
+            productClient.purchaseProducts(
+                    orderItemService.getAllOrderItemsByOrderIdToPurchaseRequest(orderId)
             );
 
             order.setOrderItemsStatus(RESERVED);
@@ -299,6 +348,16 @@ public class OrderService {
         var shippingResponse = mapper.toShippingResponse(order);
 
         shipmentClient.createShipping(shippingResponse);
+
+        notificationKafkaTemplate.sendOrderConfirmationNotification(
+                new OrderConfirmationNotification(
+                        order.getOrderId(),
+                        order.getCustomerEmail(),
+                        order.getCustomerName(),
+                        order.getTotalAmount(),
+                        orderItemService.getAllOrderItemsByOrderIdToPurchaseRequest(order.getOrderId())
+                )
+        );
 
         return repository.save(order).getOrderId();
     }

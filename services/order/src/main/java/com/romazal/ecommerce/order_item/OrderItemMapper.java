@@ -35,13 +35,13 @@ public class OrderItemMapper {
                 .build();
     }
 
-    public PurchaseRequest toPurchaseRequest(OrderItemResponse orderItemResponse) {
-        if (orderItemResponse == null) return null;
+    public PurchaseRequest toPurchaseRequest(OrderItem orderItem) {
+        if (orderItem == null) return null;
 
         return new PurchaseRequest(
-                orderItemResponse.productId(),
-                orderItemResponse.quantity(),
-                orderItemResponse.unitPrice()
+                orderItem.getProductId(),
+                orderItem.getQuantity(),
+                orderItem.getUnitPrice()
         );
     }
 }

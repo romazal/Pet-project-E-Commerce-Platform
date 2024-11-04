@@ -1,6 +1,7 @@
 package com.romazal.ecommerce.payment;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -14,4 +15,7 @@ public interface PaymentClient {
 
     @PostMapping("/create")
     UUID createPayment(@RequestBody PaymentRequest request);
+
+    @PostMapping("/refund/order/{order-id}")
+    void refundPaymentByOrderId(@PathVariable("order-id") UUID orderId);
 }

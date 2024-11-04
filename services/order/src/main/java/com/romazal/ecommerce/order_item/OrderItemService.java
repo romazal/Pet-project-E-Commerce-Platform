@@ -1,5 +1,6 @@
 package com.romazal.ecommerce.order_item;
 
+import com.romazal.ecommerce.product.PurchaseRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,13 @@ public class OrderItemService {
         return repository.findAllByOrder_OrderId(orderId)
                 .stream()
                 .map(mapper::toOrderItemResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<PurchaseRequest> getAllOrderItemsByOrderIdToPurchaseRequest(UUID orderId) {
+        return repository.findAllByOrder_OrderId(orderId)
+                .stream()
+                .map(mapper::toPurchaseRequest)
                 .collect(Collectors.toList());
     }
 
