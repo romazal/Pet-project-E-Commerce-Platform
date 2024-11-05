@@ -2,7 +2,7 @@ body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
 }
 
 .container {
@@ -32,14 +32,14 @@ p {
     font-weight: bold;
 }
 
-ul {
+.payment-details {
     padding-left: 20px;
     color: #34495e;
     font-size: 16px;
     margin: 15px 0;
 }
 
-ul li {
+.payment-details li {
     margin: 8px 0;
 }
 
@@ -54,23 +54,6 @@ ul li {
     margin: 5px 0;
 }
 
-.button {
-    display: inline-block;
-    background-color: #3498db;
-    color: #ffffff;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.button:hover {
-    background-color: #2980b9;
-}
-
 @media only screen and (max-width: 600px) {
     .container {
         width: 90%;
@@ -79,11 +62,7 @@ ul li {
     h1 {
         font-size: 20px;
     }
-    p, ul, .footer {
+    p, .footer {
         font-size: 14px;
-    }
-    .button {
-        font-size: 14px;
-        padding: 8px 12px;
     }
 }

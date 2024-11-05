@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Refund Notification</title>
+    <link rel="stylesheet" href="payment-notification.css">
+</head>
+<body>
+<div class="container">
+    <h1>Payment Refund Confirmation</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>We have successfully processed a refund for your order ID <span class="highlight" th:text="${orderId}"></span>.</p>
+
+    <p>Refund Details:</p>
+    <ul class="payment-details">
+        <li>Payment ID: <span class="highlight" th:text="${paymentId}"></span></li>
+        <li>Total Refunded Amount: <span class="highlight" th:text="${totalAmount}"></span></li>
+    </ul>
+
+    <p>If you have any questions regarding this refund, please don't hesitate to contact us. We’re here to help!</p>
+
+    <div class="footer">
+        <p>We apologize for any inconvenience caused.</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>

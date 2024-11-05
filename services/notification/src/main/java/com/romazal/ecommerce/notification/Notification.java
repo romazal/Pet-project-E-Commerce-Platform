@@ -1,5 +1,10 @@
 package com.romazal.ecommerce.notification;
 
+import com.romazal.ecommerce.kafka.order.OrderCancellationNotification;
+import com.romazal.ecommerce.kafka.order.OrderConfirmationNotification;
+import com.romazal.ecommerce.kafka.order.OrderPaymentLinkNotification;
+import com.romazal.ecommerce.kafka.payment.PaymentConfirmationNotification;
+import com.romazal.ecommerce.kafka.payment.PaymentRefundNotification;
 import com.romazal.ecommerce.kafka.product.ProductThresholdNotification;
 import com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification;
 import com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification;
@@ -29,7 +34,19 @@ public class Notification {
 
     private ProductThresholdNotification productThresholdNotification;
 
+    private OrderPaymentLinkNotification orderPaymentLinkNotification;
+
+    private OrderConfirmationNotification orderConfirmationNotification;
+
+    private OrderCancellationNotification orderCancellationNotification;
+
+    private PaymentConfirmationNotification paymentConfirmationNotification;
+
+    private PaymentRefundNotification paymentRefundNotification;
+
     private ShipmentShippedNotification shipmentShippedNotification;
 
     private ShipmentDeliveredNotification shipmentDeliveredNotification;
+
+
 }

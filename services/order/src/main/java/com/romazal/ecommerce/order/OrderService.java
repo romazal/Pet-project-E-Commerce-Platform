@@ -7,7 +7,6 @@ import com.romazal.ecommerce.kafka.notification.NotificationKafkaTemplate;
 import com.romazal.ecommerce.kafka.notification.OrderCancellationNotification;
 import com.romazal.ecommerce.kafka.notification.OrderConfirmationNotification;
 import com.romazal.ecommerce.kafka.notification.OrderPaymentLinkNotification;
-import com.romazal.ecommerce.order_item.OrderItemMapper;
 import com.romazal.ecommerce.order_item.OrderItemRequest;
 import com.romazal.ecommerce.order_item.OrderItemService;
 import com.romazal.ecommerce.payment.PaymentClient;
@@ -38,7 +37,6 @@ public class OrderService {
 
     private final OrderRepository repository;
     private final OrderMapper mapper;
-    private final OrderItemMapper orderItemMapper;
     private final OrderItemService orderItemService;
     private final ProductClient productClient;
     private final CustomerClient customerClient;
@@ -234,16 +232,17 @@ public class OrderService {
             return;
         }
 
-        if (
-            order.getOrderStatus() == DELIVERED &&
-            order.getLastModifiedDate().plusWeeks(2).isAfter(LocalDateTime.now())
+        if (order.getOrderStatus() == DELIVERED &&
+                order.getLastModifiedDate().plusWeeks(2).isAfter(LocalDateTime.now())
         ) {
             throw new BusinessException(
-                    format("Cannot cancel the order, it's been more then two weeks after receiving the products of the order")
+                    "Cannot cancel the order, it's been more then two weeks after receiving the products of the order"
             );
         }
 
-        if (order.getPaymentStatus() == PENDING || order.getPaymentStatus() == REFUNDED) {
+        if (order.getPaymentStatus() == REFUNDED) {
+            paymentClient.failPaymentByOrderId(order.getOrderId());
+        } else if (order.getPaymentStatus() == PENDING) {
             paymentClient.refundPaymentByOrderId(order.getOrderId());
         }
 

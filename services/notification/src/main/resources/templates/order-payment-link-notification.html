@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Payment Link Notification</title>
+    <link rel="stylesheet" href="order-notification.css">
+</head>
+<body>
+<div class="container">
+    <h1>Payment Link for Your Order</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>Thank you for your order! We’ve generated a secure payment link for your order <span class="highlight" th:text="${orderId}"></span>.</p>
+
+    <p>Order Summary:</p>
+    <table class="order-summary">
+        <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${orderItems}">
+            <td th:text="${item.productId}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${item.unitPrice}"></td>
+            <td th:text="${item.quantity * item.unitPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Total Amount Due:</strong> <span class="highlight" th:text="${totalAmount}"></span></p>
+
+    <p>Please proceed with the payment using the link below:</p>
+    <a th:href="@{https://localhost:4050/api/v1/payments/${paymentId}}" class="button">Pay Now</a>
+
+    <div class="footer">
+        <p>Thank you for your attention!</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>

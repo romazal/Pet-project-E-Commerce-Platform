@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <link rel="stylesheet" href="payment-notification.css">
+</head>
+<body>
+<div class="container">
+    <h1>Payment Confirmation</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>We are pleased to confirm that we have received your payment for order ID <span class="highlight" th:text="${orderId}"></span>.</p>
+
+    <p>Payment Details:</p>
+    <ul class="payment-details">
+        <li>Payment ID: <span class="highlight" th:text="${paymentId}"></span></li>
+        <li>Payment Method: <span class="highlight" th:text="${paymentMethod}"></span></li>
+        <li>Total Amount Paid: <span class="highlight" th:text="${totalAmount}"></span></li>
+    </ul>
+
+    <p>Thank you for your purchase! Your order is now being processed, and we’ll keep you updated on its progress.</p>
+
+    <div class="footer">
+        <p>If you have any questions, feel free to contact us.</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>

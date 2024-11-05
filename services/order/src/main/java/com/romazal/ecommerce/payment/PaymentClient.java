@@ -16,6 +16,10 @@ public interface PaymentClient {
     @PostMapping("/create")
     UUID createPayment(@RequestBody PaymentRequest request);
 
+    @PostMapping("/fail/order/{order-id}")
+    void failPaymentByOrderId(@PathVariable("order-id") UUID orderId);
+
     @PostMapping("/refund/order/{order-id}")
     void refundPaymentByOrderId(@PathVariable("order-id") UUID orderId);
+
 }

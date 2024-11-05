@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Cancellation Notification</title>
+    <link rel="stylesheet" href="order-notification.css">
+</head>
+<body>
+<div class="container">
+    <h1>Order Cancellation</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>We regret to inform you that your order <span class="highlight" th:text="${orderId}"></span>, placed on <span class="highlight" th:text="${createdDate}"></span>, has been canceled.</p>
+
+    <p>Order Summary:</p>
+    <table class="order-summary">
+        <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${orderItems}">
+            <td th:text="${item.productId}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${item.unitPrice}"></td>
+            <td th:text="${item.quantity * item.unitPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Total Amount:</strong> <span class="highlight" th:text="${totalAmount}"></span></p>
+
+    <p>If you have any questions or need further assistance, please contact our support team.</p>
+
+    <div class="footer">
+        <p>We apologize for any inconvenience caused.</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>

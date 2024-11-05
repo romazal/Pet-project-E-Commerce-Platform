@@ -11,13 +11,21 @@ spring:
   kafka:
     consumer:
       bootstrap-servers: localhost:9092
-      group-id: productGroup,shipmentGroup
+      group-id: productGroup,orderGroup,paymentGroup,shipmentGroup
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: '*'
-        spring.json.type.mapping: productThresholdNotification:com.romazal.ecommerce.kafka.product.ProductThresholdNotification,shipmentShippedNotification:com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification,shipmentDeliveredNotification:com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification
+        spring.json.type.mapping: >
+          productThresholdNotification:com.romazal.ecommerce.kafka.product.ProductThresholdNotification,
+          shipmentShippedNotification:com.romazal.ecommerce.kafka.shipment.ShipmentShippedNotification,
+          shipmentDeliveredNotification:com.romazal.ecommerce.kafka.shipment.ShipmentDeliveredNotification,
+          orderPaymentLinkNotification:com.romazal.ecommerce.kafka.order.OrderPaymentLinkNotification,
+          orderConfirmationNotification:com.romazal.ecommerce.kafka.order.OrderConfirmationNotification,
+          orderCancellationNotification:com.romazal.ecommerce.kafka.order.OrderCancellationNotification,
+          paymentConfirmationNotification:com.romazal.ecommerce.kafka.payment.PaymentConfirmationNotification,
+          paymentRefundNotification:com.romazal.ecommerce.kafka.payment.PaymentRefundNotification
   mail:
     host: localhost
     port: 1025

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation Notification</title>
+    <link rel="stylesheet" href="order-notification.css">
+</head>
+<body>
+<div class="container">
+    <h1>Order Confirmation</h1>
+    <p>Dear <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>Thank you for your purchase! Your order <span class="highlight" th:text="${orderId}"></span> has been successfully placed.</p>
+
+    <p>Order Summary:</p>
+    <table class="order-summary">
+        <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${orderItems}">
+            <td th:text="${item.productId}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${item.unitPrice}"></td>
+            <td th:text="${item.quantity * item.unitPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Total Amount Paid:</strong> <span class="highlight" th:text="${totalAmount}"></span></p>
+
+    <p>We’re processing your order and will update you with the shipping details shortly.</p>
+
+    <div class="footer">
+        <p>Thank you for choosing us!</p>
+        <p>Best regards,<br>Your E-commerce Team</p>
+    </div>
+</div>
+</body>
+</html>
