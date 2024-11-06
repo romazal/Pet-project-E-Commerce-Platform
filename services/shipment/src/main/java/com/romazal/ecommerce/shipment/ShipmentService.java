@@ -25,7 +25,7 @@ public class ShipmentService {
     private final NotificationKafkaTemplate notificationKafkaTemplate;
 
     public UUID createShipping(ShipmentCreationRequest shipmentCreationRequest) {
-        if(repository.findFirstByOrderIdAndDeliveryStatusNot(shipmentCreationRequest.orderId(), FAILED).isEmpty()) {
+        if(repository.findFirstByOrderIdAndDeliveryStatusNot(shipmentCreationRequest.orderId(), FAILED).isPresent()) {
             throw new IllegalArgumentException(
                     format("Shipment already exists for order ID:: %s", shipmentCreationRequest.orderId())
             );
@@ -54,7 +54,7 @@ public class ShipmentService {
         shipment.setLogisticsProvider(shipmentConfirmRequest.logisticsProvider());
         shipment.setEstimatedDeliveryDate(shipmentConfirmRequest.estimatedDeliveryDate());
 
-        orderClient.setOrderStatusToShipping(shipment.getOrderId());
+        orderClient.setOrderStatusToShipped(shipment.getOrderId());
 
         notificationKafkaTemplate.sendShipmentShippedNotification(
                 new ShipmentShippedNotification(
@@ -124,8 +124,6 @@ public class ShipmentService {
 
         shipment.setDeliveryStatus(FAILED);
 
-        orderClient.cancelOrder(shipment.getOrderId());
-
         return repository.save(shipment).getShipmentId();
     }
 
@@ -152,5 +150,17 @@ public class ShipmentService {
                 .stream()
                 .map(mapper::toShipmentResponse)
                 .toList();
+    }
+
+    public void refundShipmentByOrderId(UUID orderId) {
+        Shipment shipment = repository.findFirstByOrderIdAndDeliveryStatusNot(orderId, FAILED)
+                .orElseThrow(() -> new ShippingNotFoundException(
+                        format("No shipping found with the provided ID:: %s", orderId)
+                ));
+
+        shipment.setDeliveryStatus(REFUNDED);
+
+        repository.save(shipment);
+
     }
 }

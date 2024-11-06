@@ -21,12 +21,12 @@ public class NotificationController {
         return ResponseEntity.ok(service.getAllNotifications());
     }
 
-    @GetMapping("/{notification-id}")
+    @GetMapping("/id/{notification-id}")
     public ResponseEntity<NotificationResponse> getNotificationById(@PathVariable("notification-id") String notificationId) {
         return ResponseEntity.ok(service.getNotificationById(notificationId));
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<List<NotificationResponse>> getAllNotificationsByEmail(@PathVariable("email") String email) {
         return ResponseEntity.ok(service.getAllNotificationsByEmail(email));
     }

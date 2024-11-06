@@ -35,10 +35,10 @@ public class Shipment {
     @Column(nullable = false)
     private String customerName;
 
-    @Column(nullable = false)
+    @Column
     private String trackingNumber;
 
-    @Column(nullable = false)
+    @Column
     private String logisticsProvider;
 
     @Enumerated(STRING)

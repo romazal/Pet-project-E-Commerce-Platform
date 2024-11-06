@@ -150,4 +150,22 @@ public class PaymentService {
                 .map(mapper::toPaymentResponse)
                 .toList();
     }
+
+    public UUID failPaymentByOrderId(UUID orderId) {
+        var payment = repository.findFirstByOrderIdOrderByCreatedDateDesc(orderId)
+                .orElseThrow(() -> new PaymentNotFoundException(
+                        format("No payment found with the provided order ID:: %s", orderId)
+                ));
+
+        return failPayment(payment.getPaymentId());
+    }
+
+    public UUID refundPaymentByOrderId(UUID orderId) {
+        var payment = repository.findFirstByOrderIdOrderByCreatedDateDesc(orderId)
+                .orElseThrow(() -> new PaymentNotFoundException(
+                        format("No payment found with the provided order ID:: %s", orderId)
+                ));
+
+        return refundPayment(payment.getPaymentId());
+    }
 }

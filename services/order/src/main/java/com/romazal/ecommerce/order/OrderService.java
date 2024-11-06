@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 import static com.romazal.ecommerce.order.OrderStatus.*;
 import static com.romazal.ecommerce.order_item.OrderItemsStatus.RESERVED;
 import static com.romazal.ecommerce.order_item.OrderItemsStatus.UNRESERVED;
+import static com.romazal.ecommerce.payment.PaymentStatus.*;
 import static com.romazal.ecommerce.payment.PaymentStatus.PENDING;
-import static com.romazal.ecommerce.payment.PaymentStatus.REFUNDED;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -233,16 +233,16 @@ public class OrderService {
         }
 
         if (order.getOrderStatus() == DELIVERED &&
-                order.getLastModifiedDate().plusWeeks(2).isAfter(LocalDateTime.now())
+                order.getLastModifiedDate().plusWeeks(2).isBefore(LocalDateTime.now())
         ) {
             throw new BusinessException(
                     "Cannot cancel the order, it's been more then two weeks after receiving the products of the order"
             );
         }
 
-        if (order.getPaymentStatus() == REFUNDED) {
+        if (order.getPaymentStatus() == PENDING) {
             paymentClient.failPaymentByOrderId(order.getOrderId());
-        } else if (order.getPaymentStatus() == PENDING) {
+        } else if (order.getPaymentStatus() == PAID) {
             paymentClient.refundPaymentByOrderId(order.getOrderId());
         }
 
@@ -259,6 +259,7 @@ public class OrderService {
         }
 
         order.setOrderStatus(CANCELED);
+        order.setPaymentStatus(REFUNDED);
 
         notificationKafkaTemplate.sendOrderCancellationNotification(
                 new OrderCancellationNotification(
@@ -299,6 +300,7 @@ public class OrderService {
         }
 
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setPaymentStatus(PENDING);
 
         var paymentResponse = mapper.toPaymentResponse(order);
 
@@ -315,7 +317,9 @@ public class OrderService {
                 )
         );
 
-        return repository.save(order).getOrderId();
+        repository.save(order);
+
+        return paymentId;
     }
 
     public UUID confirmOrder(UUID orderId) {
@@ -343,6 +347,7 @@ public class OrderService {
         }
 
         order.setOrderStatus(CONFIRMED);
+        order.setPaymentStatus(PAID);
 
         var shippingResponse = mapper.toShippingResponse(order);
 
@@ -366,5 +371,23 @@ public class OrderService {
                 .stream()
                 .map(mapper::toOrderResponse)
                 .toList();
+    }
+
+    public UUID updateOrderStatus(UUID orderId, OrderStatus orderStatus) {
+        var order = repository.findById(orderId).orElseThrow(() -> new IllegalArgumentException(
+                format("No order found with the provided ID:: %s", orderId)
+        ));
+
+        order.setOrderStatus(orderStatus);
+
+        return repository.save(order).getOrderId();
+    }
+
+    public UUID setOrderStatusToShipped(UUID orderId) {
+        return updateOrderStatus(orderId, SHIPPED);
+    }
+
+    public UUID setOrderStatusToDelivered(UUID orderId) {
+        return updateOrderStatus(orderId, DELIVERED);
     }
 }

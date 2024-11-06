@@ -34,6 +34,16 @@ public class PaymentController {
         return ResponseEntity.ok(service.refundPayment(paymentId));
     }
 
+    @PostMapping("/fail/order/{order-id}")
+    public ResponseEntity<UUID> failPaymentByOrderId(@PathVariable("order-id") UUID orderId){
+        return ResponseEntity.ok(service.failPaymentByOrderId(orderId));
+    }
+
+    @PostMapping("/refund/order/{order-id}")
+    public ResponseEntity<UUID> refundPaymentByOrderId(@PathVariable("order-id") UUID orderId){
+        return ResponseEntity.ok(service.refundPaymentByOrderId(orderId));
+    }
+
     @GetMapping
     public ResponseEntity<List<PaymentResponse>> getAllPayments() {
         return ResponseEntity.ok(service.getAllPayments());

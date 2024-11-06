@@ -45,6 +45,16 @@ public class OrderController {
         return ResponseEntity.ok(service.confirmOrder(orderId));
     }
 
+    @PutMapping("/shipment/shipped/{order-id}")
+    public ResponseEntity<UUID> setOrderStatusToShipped(@PathVariable("order-id") UUID orderId) {
+        return ResponseEntity.ok(service.setOrderStatusToShipped(orderId));
+    }
+
+    @PutMapping("/shipment/delivered/{order-id}")
+    public ResponseEntity<UUID> setOrderStatusToDelivered(@PathVariable("order-id") UUID orderId) {
+        return ResponseEntity.ok(service.setOrderStatusToDelivered(orderId));
+    }
+
     @PutMapping("/cancel/{order-id}")
     public ResponseEntity<Void> cancelOrder(@PathVariable("order-id") UUID orderId) {
         service.cancelOrder(orderId);

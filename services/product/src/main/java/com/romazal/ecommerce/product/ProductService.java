@@ -262,9 +262,7 @@ public class ProductService {
                 product.getProductId(), RESTOCK);
     }
 
-    public Integer refundProducts(List<ProductPurchaseRequest> request) {
-        Integer products = 0;
-
+    public void refundProducts(List<ProductPurchaseRequest> request) {
         for(ProductPurchaseRequest productPurchaseRequest : request) {
             var product = repository.findById(productPurchaseRequest.productId())
                     .orElseThrow(() -> new ProductNotFoundException(
@@ -289,11 +287,7 @@ public class ProductService {
 
             log.info("Sent product movement record to Product Movement service. Product ID:: {}, movement type:: {}",
                     product.getProductId(), ORDER_RETURN);
-
-            products++;
         }
-
-        return products;
 
     }
 

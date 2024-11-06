@@ -19,7 +19,7 @@ public class ShipmentController {
         return ResponseEntity.ok(service.createShipping(shipmentCreationRequest));
     }
 
-    @PutMapping
+    @PutMapping("/confirm")
     public ResponseEntity<UUID> confirmShipping(@RequestBody ShipmentConfirmRequest shipmentConfirmRequest) {
         return ResponseEntity.ok(service.confirmShipping(shipmentConfirmRequest));
     }
@@ -34,12 +34,18 @@ public class ShipmentController {
         return ResponseEntity.ok(service.failShipping(shipmentId));
     }
 
+    @PutMapping("/refund/order/{order-id}")
+    public ResponseEntity<Void> refundShipmentByOrderId(@PathVariable("order-id") UUID orderId) {
+        service.refundShipmentByOrderId(orderId);
+        return ResponseEntity.accepted().build();
+    }
+
     @GetMapping("/{shipment-id}")
     public ResponseEntity<ShipmentResponse> getShipmentByShipmentId(@PathVariable("shipment-id") UUID shipmentId) {
         return ResponseEntity.ok(service.getShipmentByShipmentId(shipmentId));
     }
 
-    @GetMapping("/{tracking-number}")
+    @GetMapping("/tracking/{tracking-number}")
     public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("tracking-number") String trackingNumber) {
         return ResponseEntity.ok(service.getShipmentByTrackingNumber(trackingNumber));
     }

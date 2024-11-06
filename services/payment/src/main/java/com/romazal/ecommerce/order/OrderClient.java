@@ -11,6 +11,6 @@ import java.util.UUID;
         url = "${application.config.order-url}"
 )
 public interface OrderClient {
-    @PutMapping
+    @PutMapping("/confirm/{order-id}")
     UUID confirmOrder(@PathVariable("order-id") UUID orderId);
 }

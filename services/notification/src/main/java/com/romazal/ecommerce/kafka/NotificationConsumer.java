@@ -165,7 +165,7 @@ public class NotificationConsumer {
                                         """
                                         Order Payment Link Notification:
                                         
-                                        The order ID: %s has initiated a payment request.
+                                        The order has initiated a payment request.
                                         
                                         Order ID: %s
                                         Payment ID: %s
@@ -202,7 +202,7 @@ public class NotificationConsumer {
                                         """
                                         Order Confirmation Notification:
                                         
-                                        The order ID: %s has been confirmed.
+                                        The order has been confirmed.
                                         
                                         Order ID: %s
                                         """,
@@ -236,7 +236,7 @@ public class NotificationConsumer {
                                         """
                                         Order Cancellation Notification:
                                         
-                                        The order ID: %s has been cancelled.
+                                        The order has been cancelled.
                                         
                                         Order ID: %s
                                         """,
@@ -271,7 +271,7 @@ public class NotificationConsumer {
                                         """
                                         Payment Confirmation Notification:
                                         
-                                        The payment ID: %s has been confirmed.
+                                        The payment has been confirmed.
                                         
                                         Order ID: %s
                                         Payment ID: %s
@@ -308,7 +308,7 @@ public class NotificationConsumer {
                                         """
                                         Payment Refund Notification:
                                         
-                                        The payment ID: %s has been refunded.
+                                        The payment has been refunded.
                                         
                                         Order ID: %s
                                         Payment ID: %s

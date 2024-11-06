@@ -47,6 +47,8 @@ public class OrderMapper {
 
         return new PaymentRequest(
                 order.getOrderId(),
+                order.getCustomerEmail(),
+                order.getCustomerName(),
                 order.getTotalAmount(),
                 order.getPaymentMethod()
         );
@@ -56,7 +58,9 @@ public class OrderMapper {
         if (order == null) return null;
 
         return new ShipmentCreationRequest(
-                order.getOrderId()
+                order.getOrderId(),
+                order.getCustomerEmail(),
+                order.getCustomerName()
         );
     }
 }

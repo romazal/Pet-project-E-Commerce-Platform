@@ -11,12 +11,9 @@ import java.util.UUID;
         url = "${application.config.order-url}"
 )
 public interface OrderClient {
-    @PutMapping
-    UUID setOrderStatusToShipping(@PathVariable("order-id") UUID orderId);
+    @PutMapping("/shipment/shipped/{order-id}")
+    UUID setOrderStatusToShipped(@PathVariable("order-id") UUID orderId);
 
-    @PutMapping
+    @PutMapping("/shipment/delivered/{order-id}")
     UUID setOrderStatusToDelivered(@PathVariable("order-id") UUID orderId);
-
-    @PutMapping
-    UUID cancelOrder(@PathVariable("order-id") UUID orderId);
 }

@@ -13,6 +13,7 @@ public class ShipmentMapper {
                 .orderId(shipmentCreationRequest.orderId())
                 .customerEmail(shipmentCreationRequest.customerEmail())
                 .customerName(shipmentCreationRequest.customerName())
+                .deliveryStatus(DeliveryStatus.PENDING)
                 .build();
     }
 

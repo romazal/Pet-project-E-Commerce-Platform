@@ -66,10 +66,11 @@ public class ProductController {
     }
 
     @PutMapping("/refund")
-    public ResponseEntity<Integer> refundProducts(
+    public ResponseEntity<Void> refundProducts(
             @RequestBody List<ProductPurchaseRequest> request
     ){
-        return ResponseEntity.ok(service.refundProducts(request));
+        service.refundProducts(request);
+        return ResponseEntity.accepted().build();
     }
 
 
