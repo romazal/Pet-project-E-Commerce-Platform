@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.romazal.ecommerce.shipment.DeliveryStatus.*;
@@ -49,6 +50,9 @@ public class ShipmentService {
 
         shipment.setDeliveryStatus(SHIPPING);
         shipment.setShippedDate(LocalDateTime.now());
+        shipment.setTrackingNumber(shipmentConfirmRequest.trackingNumber());
+        shipment.setLogisticsProvider(shipmentConfirmRequest.logisticsProvider());
+        shipment.setEstimatedDeliveryDate(shipmentConfirmRequest.estimatedDeliveryDate());
 
         orderClient.setOrderStatusToShipping(shipment.getOrderId());
 
@@ -123,5 +127,30 @@ public class ShipmentService {
         orderClient.cancelOrder(shipment.getOrderId());
 
         return repository.save(shipment).getShipmentId();
+    }
+
+    public ShipmentResponse getShipmentByShipmentId(UUID shipmentId) {
+        return repository.findById(shipmentId).map(mapper::toShipmentResponse)
+                .orElseThrow(
+                        () -> new ShippingNotFoundException(
+                                format("No shipping found with the provided ID:: %s", shipmentId)
+                        )
+                );
+    }
+
+    public ShipmentResponse getShipmentByTrackingNumber(String trackingNumber) {
+        return repository.findByTrackingNumber(trackingNumber).map(mapper::toShipmentResponse)
+                .orElseThrow(
+                        () -> new ShippingNotFoundException(
+                                format("No shipping found with the provided tracking number:: %s", trackingNumber)
+                        )
+                );
+    }
+
+    public List<ShipmentResponse> getAllShipments() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toShipmentResponse)
+                .toList();
     }
 }

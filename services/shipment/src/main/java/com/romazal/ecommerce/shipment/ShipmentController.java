@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,5 +32,20 @@ public class ShipmentController {
     @PutMapping("/fail/{shipment-id}")
     public ResponseEntity<UUID> failShipping(@PathVariable("shipment-id") UUID shipmentId) {
         return ResponseEntity.ok(service.failShipping(shipmentId));
+    }
+
+    @GetMapping("/{shipment-id}")
+    public ResponseEntity<ShipmentResponse> getShipmentByShipmentId(@PathVariable("shipment-id") UUID shipmentId) {
+        return ResponseEntity.ok(service.getShipmentByShipmentId(shipmentId));
+    }
+
+    @GetMapping("/{tracking-number}")
+    public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("tracking-number") String trackingNumber) {
+        return ResponseEntity.ok(service.getShipmentByTrackingNumber(trackingNumber));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ShipmentResponse>> getAllShipments() {
+        return ResponseEntity.ok(service.getAllShipments());
     }
 }

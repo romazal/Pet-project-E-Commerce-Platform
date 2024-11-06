@@ -58,11 +58,18 @@ public class ProductController {
         return ResponseEntity.ok(service.getAllProductsByVendorId(vendorId));
     }
 
-    @PostMapping("/purchase")
+    @PutMapping("/purchase")
     public ResponseEntity<List<ProductPurchaseResponse>> purchaseProducts(
             @RequestBody List<ProductPurchaseRequest> request
     ){
         return ResponseEntity.ok(service.purchaseProducts(request));
+    }
+
+    @PutMapping("/refund")
+    public ResponseEntity<Integer> refundProducts(
+            @RequestBody List<ProductPurchaseRequest> request
+    ){
+        return ResponseEntity.ok(service.refundProducts(request));
     }
 
 

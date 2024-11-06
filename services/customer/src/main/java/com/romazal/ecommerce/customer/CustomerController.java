@@ -47,7 +47,7 @@ public class CustomerController {
     }
 
     @GetMapping("/orders/{customer-id}")
-    public ResponseEntity<List<OrderResponse>> getAllOrdersByCustomerId(@PathVariable Long customerId) {
+    public ResponseEntity<List<OrderResponse>> getAllOrdersByCustomerId(@PathVariable("customer-id") Long customerId) {
         return ResponseEntity.ok(service.getAllOrdersByCustomerId(customerId));
     }
 

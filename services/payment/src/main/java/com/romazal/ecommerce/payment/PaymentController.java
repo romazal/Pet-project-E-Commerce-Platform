@@ -19,17 +19,17 @@ public class PaymentController {
         return ResponseEntity.ok(service.createPayment(paymentRequest));
     }
 
-    @PostMapping("/confirm/{payment-id}")
+    @PutMapping("/confirm/{payment-id}")
     public ResponseEntity<UUID> confirmPayment(@PathVariable("payment-id") UUID paymentId) {
         return ResponseEntity.ok(service.confirmPayment(paymentId));
     }
 
-    @PostMapping("/fail/{payment-id}")
+    @PutMapping("/fail/{payment-id}")
     public ResponseEntity<UUID> failPayment(@PathVariable("payment-id") UUID paymentId) {
         return ResponseEntity.ok(service.failPayment(paymentId));
     }
 
-    @PostMapping("/refund/{payment-id}")
+    @PutMapping("/refund/{payment-id}")
     public ResponseEntity<UUID> refundPayment(@PathVariable("payment-id") UUID paymentId) {
         return ResponseEntity.ok(service.refundPayment(paymentId));
     }
@@ -59,7 +59,7 @@ public class PaymentController {
         return ResponseEntity.ok(service.getPaymentStatusByOrderId(orderId));
     }
 
-    @GetMapping("//order/history/{order-id}")
+    @GetMapping("/history/order/{order-id}")
     public ResponseEntity<List<PaymentResponse>> getPaymentHistoryByOrderId(@PathVariable("order-id") UUID orderId) {
         return ResponseEntity.ok(service.getPaymentHistoryByOrderId(orderId));
     }

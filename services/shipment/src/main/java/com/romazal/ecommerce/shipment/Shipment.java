@@ -43,7 +43,7 @@ public class Shipment {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private DeliveryStatus deliveryStatus = PENDING;
+    private DeliveryStatus deliveryStatus;
 
     @Column
     private LocalDateTime shippedDate;

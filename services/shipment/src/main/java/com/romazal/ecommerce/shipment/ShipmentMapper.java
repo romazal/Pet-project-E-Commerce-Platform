@@ -4,15 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ShipmentMapper {
-    public Shipment toShipping(ShipmentConfirmRequest shipmentConfirmRequest) {
-        if (shipmentConfirmRequest == null) return null;
 
-        return new Shipment().builder()
-                .trackingNumber(shipmentConfirmRequest.trackingNumber())
-                .logisticsProvider(shipmentConfirmRequest.logisticsProvider())
-                .estimatedDeliveryDate(shipmentConfirmRequest.estimatedDeliveryDate())
-                .build();
-    }
 
     public Shipment toShipping(ShipmentCreationRequest shipmentCreationRequest) {
         if (shipmentCreationRequest == null) return null;
@@ -22,5 +14,24 @@ public class ShipmentMapper {
                 .customerEmail(shipmentCreationRequest.customerEmail())
                 .customerName(shipmentCreationRequest.customerName())
                 .build();
+    }
+
+    public ShipmentResponse toShipmentResponse(Shipment shipment) {
+        if (shipment == null) return null;
+
+        return new ShipmentResponse(
+                shipment.getShipmentId(),
+                shipment.getOrderId(),
+                shipment.getCustomerEmail(),
+                shipment.getCustomerName(),
+                shipment.getTrackingNumber(),
+                shipment.getLogisticsProvider(),
+                shipment.getDeliveryStatus(),
+                shipment.getShippedDate(),
+                shipment.getEstimatedDeliveryDate(),
+                shipment.getDeliveredDate(),
+                shipment.getCreatedDate(),
+                shipment.getLastModifiedDate()
+        );
     }
 }

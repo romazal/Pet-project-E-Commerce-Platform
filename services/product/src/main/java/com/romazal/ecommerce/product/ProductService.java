@@ -19,8 +19,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.romazal.ecommerce.kafka.product_movement.MovementType.PURCHASE;
-import static com.romazal.ecommerce.kafka.product_movement.MovementType.RESTOCK;
+import static com.romazal.ecommerce.kafka.product_movement.MovementType.*;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -261,6 +260,41 @@ public class ProductService {
         );
         log.info("Sent product movement record to Product Movement service. Product ID:: {}, movement type:: {}",
                 product.getProductId(), RESTOCK);
+    }
+
+    public Integer refundProducts(List<ProductPurchaseRequest> request) {
+        Integer products = 0;
+
+        for(ProductPurchaseRequest productPurchaseRequest : request) {
+            var product = repository.findById(productPurchaseRequest.productId())
+                    .orElseThrow(() -> new ProductNotFoundException(
+                            format("Failed to restock the product, no product found with ID:: %s ", productPurchaseRequest.productId())
+                    ));
+
+            var newStockQuantity = product.getStockQuantity() + productPurchaseRequest.quantity();
+
+            product.setStockQuantity(newStockQuantity);
+
+            productCacheService.updateProduct(product);
+
+            productMovementKafkaTemplate.sendProductMovementRecord(
+                    new ProductMovementRecord(
+                            product.getProductId(),
+                            productPurchaseRequest.quantity(),
+                            product.getStockQuantity() - productPurchaseRequest.quantity(),
+                            product.getStockQuantity(),
+                            ORDER_RETURN
+                    )
+            );
+
+            log.info("Sent product movement record to Product Movement service. Product ID:: {}, movement type:: {}",
+                    product.getProductId(), ORDER_RETURN);
+
+            products++;
+        }
+
+        return products;
+
     }
 
 }
